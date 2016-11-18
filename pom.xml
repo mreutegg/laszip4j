@@ -44,8 +44,8 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/mreutegg/laszip4j.git</connection>
-        <developerConnection>scm:git:ssh://github.com:mreutegg/laszip4j.git</developerConnection>
+        <connection>scm:git:https://github.com/mreutegg/laszip4j.git</connection>
+        <developerConnection>scm:git:git@github.com:mreutegg/laszip4j.git</developerConnection>
         <url>https://github.com/mreutegg/laszip4j/tree/master</url>
     </scm>
 
