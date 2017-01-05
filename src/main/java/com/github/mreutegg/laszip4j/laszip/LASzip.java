@@ -449,6 +449,9 @@ public class LASzip {
 
         num_items[0] = (char) (1 + asInt(have_gps_time) + asInt(have_rgb) + asInt(have_wavepacket) + asInt(extra_bytes_number != 0));
         items[0] = new LASitem[num_items[0]];
+        for (int i = 0; i < items[0].length; i++) {
+            items[0][i] = new LASitem();
+        }
 
         int i = 1;
         if (have_point14)
