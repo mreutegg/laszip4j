@@ -108,7 +108,9 @@ public interface MyDefs {
     }
 
     static long[] realloc(long[] data, int size) {
-        if (data.length >= size) {
+        if (data == null) {
+            return new long[size];
+        } else if (data.length >= size) {
             return data;
         }
         long[] tmp = new long[size];
