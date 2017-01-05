@@ -14,12 +14,13 @@ import com.github.mreutegg.laszip4j.laszip.ByteStreamIn;
 import com.github.mreutegg.laszip4j.laszip.LASindex;
 import com.github.mreutegg.laszip4j.laszip.LASpoint;
 
+import java.io.Closeable;
 import java.util.concurrent.Callable;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
-public abstract class LASreader {
+public abstract class LASreader implements Closeable {
 
     public LASheader header = new LASheader();
     public LASpoint point = new LASpoint();
