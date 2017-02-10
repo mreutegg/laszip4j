@@ -93,6 +93,27 @@ public final class LASPoint {
     }
 
     /**
+     * @return "Synthetic" flag.
+     */
+    public boolean isSynthetic() {
+        return p.getSynthetic_flag() == 1;
+    }
+
+    /**
+     * @return "Key-point" flag.
+     */
+    public boolean isKeyPoint() {
+        return p.getSynthetic_flag() == 1;
+    }
+
+    /**
+     * @return "Withheld" flag.
+     */
+    public boolean isWithheld() {
+        return p.getWithheld_flag() == 1;
+    }
+
+    /**
      * @return "Scan Angle Rank (-90 to +90) - Left side" as a signed byte.
      */
     public byte getScanAngleRank() {
