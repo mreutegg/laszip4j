@@ -196,8 +196,11 @@ public class LASreadPoint {
                     default:
                         return FALSE;
                 }
-                // TODO: implement seek_point
-                //if (i != 0) seek_point[i] = seek_point[i-1]+items[i-1].size;
+                if (i != 0) {
+                    ByteBuffer bb = seek_point[i-1].duplicate();
+                    bb.position(items[i-1].size);
+                    seek_point[i] = bb.slice();
+                }
             }
             if (laszip.compressor == LASZIP_COMPRESSOR_POINTWISE_CHUNKED)
             {
