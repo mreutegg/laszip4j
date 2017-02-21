@@ -18,6 +18,7 @@ package com.github.mreutegg.laszip4j;
 
 import com.github.mreutegg.laszip4j.laslib.LASreadOpener;
 import com.github.mreutegg.laszip4j.laslib.LASreader;
+import com.github.mreutegg.laszip4j.laszip.LASpoint;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,6 +33,8 @@ public final class LASReader {
 
     private final File file;
 
+    private Constraint constraint = new None();
+
     /**
      * Constructs a new reader for the given file. The file may refer to a raw
      * LAS or compressed LAZ file.
@@ -40,6 +43,42 @@ public final class LASReader {
      */
     public LASReader(File file) {
         this.file = file;
+    }
+
+    /**
+     * Only return points that fall into the specified tile.
+     * The specification of the tile refers to point data
+     * adjusted with scale and offset from the LAS header.
+     *
+     * @return this reader.
+     */
+    public LASReader insideTile(float ll_x, float ll_y, float size) {
+        constraint = reader -> reader.inside_tile(ll_x, ll_y, size);
+        return this;
+    }
+
+    /**
+     * Only return points that fall into the specified tile.
+     * The specification of the circle refers to point data
+     * adjusted with scale and offset from the LAS header.
+     *
+     * @return this reader.
+     */
+    public LASReader insideCircle(double center_x, double center_y, double radius) {
+        constraint = reader -> reader.inside_circle(center_x, center_y, radius);
+        return this;
+    }
+
+    /**
+     * Only return points that fall into the specified rectangle.
+     * The specification of the rectangle refers to point data
+     * adjusted with scale and offset from the LAS header.
+     *
+     * @return this reader.
+     */
+    public LASReader insideRectangle(double min_x, double min_y, double max_x, double max_y) {
+        constraint = reader -> reader.inside_rectangle(min_x, min_y, max_x, max_y);
+        return this;
     }
 
     /**
@@ -65,17 +104,28 @@ public final class LASReader {
             throw new UncheckedIOException(
                     new FileNotFoundException(file.getAbsolutePath()));
         }
-        return new LASreadOpener().open(file.getAbsolutePath());
+        LASreader reader = new LASreadOpener().open(file.getAbsolutePath());
+        constraint.apply(reader);
+        return reader;
     }
 
     private class LASPointIterator implements Iterator<LASPoint> {
 
+        private final LASPoint end = new LASPoint(new LASpoint());
+
         private final LASreader r = openReader();
-        private LASPoint next = readNext();
+        private LASPoint next = null;
 
         @Override
         public boolean hasNext() {
-            return next != null;
+            if (next == end) {
+                return false;
+            } else if (next != null) {
+                return true;
+            } else {
+                next = readNext();
+                return next != end;
+            }
         }
 
         @Override
@@ -84,7 +134,7 @@ public final class LASReader {
                 throw new NoSuchElementException();
             }
             LASPoint p = next;
-            next = readNext();
+            next = null;
             return p;
         }
 
@@ -92,8 +142,22 @@ public final class LASReader {
             LASPoint p = r.read_point() ? new LASPoint(r.point) : null;
             if (p == null) {
                 r.close();
+                p = end;
             }
             return p;
+        }
+    }
+
+    private interface Constraint {
+
+        boolean apply(LASreader reader);
+    }
+
+    private final class None implements Constraint {
+
+        @Override
+        public boolean apply(LASreader reader) {
+            return reader.inside_none();
         }
     }
 }
