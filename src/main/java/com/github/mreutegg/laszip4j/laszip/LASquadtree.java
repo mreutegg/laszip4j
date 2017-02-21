@@ -577,7 +577,7 @@ public class LASquadtree {
                 fprintf(stderr,"ERROR (LASquadtree): reading version\n");
                 return FALSE;
             }
-            try { version = stream.get32bitsLE(); } catch (Exception e)
+            try { levels = stream.get32bitsLE(); } catch (Exception e)
             {
                 fprintf(stderr,"ERROR (LASquadtree): reading levels\n");
                 return FALSE;
