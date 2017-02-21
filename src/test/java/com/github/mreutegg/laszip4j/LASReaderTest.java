@@ -16,16 +16,18 @@
  */
 package com.github.mreutegg.laszip4j;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
+import java.net.URI;
 
-import static org.apache.commons.io.IOUtils.copy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -41,10 +43,12 @@ public class LASReaderTest {
     @Before
     public void before() throws Exception {
         if (!laz.exists()) {
-            URL url = new URL(BASE_URL + "/" + LAZ_NAME);
-            try (InputStream in = url.openStream()) {
-                try (OutputStream out = new FileOutputStream(laz)) {
-                    copy(in, out);
+            URI url = new URI(BASE_URL + "/" + LAZ_NAME);
+            try (CloseableHttpClient client = HttpClients.createDefault()) {
+                try (CloseableHttpResponse response = client.execute(new HttpGet(url))) {
+                    try (OutputStream out = new FileOutputStream(laz)) {
+                        response.getEntity().writeTo(out);
+                    }
                 }
             }
         }
@@ -71,8 +75,8 @@ public class LASReaderTest {
 
     @Test
     public void insideTile() throws Exception {
-        LASReader reader = new LASReader(laz);
-        reader.insideTile(1442000, 378000, 1000);
+        LASReader reader = new LASReader(laz)
+                .insideTile(1442000, 378000, 1000);
 
         int minX = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE;
@@ -99,8 +103,8 @@ public class LASReaderTest {
 
     @Test
     public void insideRectangle() throws Exception {
-        LASReader reader = new LASReader(laz);
-        reader.insideRectangle(1441000, 376000, 1443000, 377000);
+        LASReader reader = new LASReader(laz)
+                .insideRectangle(1441000, 376000, 1443000, 377000);
 
         int minX = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE;
@@ -127,8 +131,8 @@ public class LASReaderTest {
 
     @Test
     public void insideCircle() throws Exception {
-        LASReader reader = new LASReader(laz);
-        reader.insideCircle(1442000, 378000, 500);
+        LASReader reader = new LASReader(laz)
+                .insideCircle(1442000, 378000, 500);
 
         int minX = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE;
