@@ -228,6 +228,9 @@ public class LASinterval {
         else
         {
             hash_element = cells.tailMap(last_index).entrySet().iterator();
+            if (hash_element.hasNext()) {
+                hash_element.next();
+            }
         }
         if (!hash_element.hasNext())
         {
