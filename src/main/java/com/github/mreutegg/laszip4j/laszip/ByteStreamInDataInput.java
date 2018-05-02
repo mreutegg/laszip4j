@@ -23,12 +23,12 @@ import java.nio.ByteBuffer;
 
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 
-abstract class ByteStreamInDataInput extends ByteStreamIn {
+public abstract class ByteStreamInDataInput extends ByteStreamIn {
 
     private final ByteBuffer buffer;
     protected DataInput dataIn;
 
-    ByteStreamInDataInput(DataInput in) {
+    public ByteStreamInDataInput(DataInput in) {
         super();
         this.dataIn = in;
         this.buffer = ByteBuffer.allocate(8);

@@ -21,7 +21,7 @@ public class LASreadItemCompressed_BYTE_v1 extends LASreadItemCompressed {
 
     private IntegerCompressor ic_byte;
 
-    LASreadItemCompressed_BYTE_v1(ArithmeticDecoder dec, int number)
+    public LASreadItemCompressed_BYTE_v1(ArithmeticDecoder dec, int number)
     {
         /* set decoder */
         assert(dec != null);

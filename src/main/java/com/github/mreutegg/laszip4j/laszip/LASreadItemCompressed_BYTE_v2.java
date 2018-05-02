@@ -22,7 +22,7 @@ public class LASreadItemCompressed_BYTE_v2 extends LASreadItemCompressed {
 
     private ArithmeticModel[] m_byte;
 
-    LASreadItemCompressed_BYTE_v2(ArithmeticDecoder dec, int number)
+    public LASreadItemCompressed_BYTE_v2(ArithmeticDecoder dec, int number)
     {
         int i;
 
