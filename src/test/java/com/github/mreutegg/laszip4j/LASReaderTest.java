@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 public class LASReaderTest {
 
     private static final String LAZ_NAME = "libLAS_1.2.laz";
-    private static final String BASE_URL = "http://www.liblas.org/samples";
+    private static final String BASE_URL = "https://web.archive.org/web/20160328153147if_/http://www.liblas.org/samples";
     private static final int NUM_POINT_RECORDS = 497536;
 
     private File target = new File("target");
