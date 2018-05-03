@@ -26,3 +26,5 @@ for reading LAS points. You can read LAS points in your code like this:
 
 See also [LASReaderTest](src/test/java/com/github/mreutegg/laszip4j/LASReaderTest.java)
 on how to use the LASReader class.
+
+[![Build Status](https://semaphoreci.com/api/v1/mreutegg/laszip4j/branches/master/badge.svg)](https://semaphoreci.com/mreutegg/laszip4j)
