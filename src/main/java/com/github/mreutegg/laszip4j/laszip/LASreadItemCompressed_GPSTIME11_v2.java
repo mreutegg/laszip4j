@@ -34,7 +34,7 @@ public class LASreadItemCompressed_GPSTIME11_v2 extends LASreadItemCompressed {
     private ArithmeticModel m_gpstime_0diff;
     private IntegerCompressor ic_gpstime;
 
-    LASreadItemCompressed_GPSTIME11_v2(ArithmeticDecoder dec)
+    public LASreadItemCompressed_GPSTIME11_v2(ArithmeticDecoder dec)
     {
         /* set decoder */
         assert(dec != null);

@@ -23,7 +23,7 @@ public class LASreadItemCompressed_RGB12_v1 extends LASreadItemCompressed {
     private ArithmeticModel m_byte_used;
     private IntegerCompressor ic_rgb;
 
-    LASreadItemCompressed_RGB12_v1(ArithmeticDecoder dec)
+    public LASreadItemCompressed_RGB12_v1(ArithmeticDecoder dec)
     {
         /* set decoder */
         assert(dec != null);

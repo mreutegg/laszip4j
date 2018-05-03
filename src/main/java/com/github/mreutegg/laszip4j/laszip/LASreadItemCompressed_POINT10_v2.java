@@ -40,7 +40,7 @@ public class LASreadItemCompressed_POINT10_v2 extends LASreadItemCompressed {
     private IntegerCompressor ic_dy;
     private IntegerCompressor ic_z;
 
-    LASreadItemCompressed_POINT10_v2(ArithmeticDecoder dec)
+    public LASreadItemCompressed_POINT10_v2(ArithmeticDecoder dec)
     {
         int i; // unsigned
 

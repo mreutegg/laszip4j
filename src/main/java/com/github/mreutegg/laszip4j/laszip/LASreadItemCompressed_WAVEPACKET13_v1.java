@@ -28,7 +28,7 @@ public class LASreadItemCompressed_WAVEPACKET13_v1 extends LASreadItemCompressed
     private IntegerCompressor ic_return_point;
     private IntegerCompressor ic_xyz;
 
-    LASreadItemCompressed_WAVEPACKET13_v1(ArithmeticDecoder dec)
+    public LASreadItemCompressed_WAVEPACKET13_v1(ArithmeticDecoder dec)
     {
         /* set decoder */
         assert(dec != null);

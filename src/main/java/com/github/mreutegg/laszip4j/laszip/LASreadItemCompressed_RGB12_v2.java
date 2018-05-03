@@ -29,7 +29,7 @@ public class LASreadItemCompressed_RGB12_v2 extends LASreadItemCompressed {
     private ArithmeticModel m_rgb_diff_4;
     private ArithmeticModel m_rgb_diff_5;
 
-    LASreadItemCompressed_RGB12_v2(ArithmeticDecoder dec)
+    public LASreadItemCompressed_RGB12_v2(ArithmeticDecoder dec)
     {
         /* set decoder */
         assert(dec != null);
