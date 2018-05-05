@@ -33,9 +33,9 @@ import static org.junit.Assert.assertTrue;
 
 public class LASReaderTest {
 
-    private static final String LAZ_NAME = "libLAS_1.2.laz";
-    private static final String BASE_URL = "https://web.archive.org/web/20160328153147if_/http://www.liblas.org/samples";
-    private static final int NUM_POINT_RECORDS = 497536;
+    private static final String LAZ_NAME = "26690_12570.laz";
+    private static final String BASE_URL = "http://maps.zh.ch/download/hoehen/2014/lidar";
+    private static final int NUM_POINT_RECORDS = 265401;
 
     private File target = new File("target");
     private File laz = new File(target, LAZ_NAME);
@@ -60,7 +60,7 @@ public class LASReaderTest {
         LASHeader header = reader.getHeader();
 
         long[] classifications = new long[Byte.MAX_VALUE];
-        assertEquals("TerraScan", header.getGeneratingSoftware());
+        assertEquals("las_reframe.exe", header.getGeneratingSoftware());
         long numPoints = 0;
         for (LASPoint p : reader.getPoints()) {
             classifications[p.getClassification()]++;
@@ -68,15 +68,18 @@ public class LASReaderTest {
         }
         assertEquals(NUM_POINT_RECORDS, header.getLegacyNumberOfPointRecords());
         assertEquals(NUM_POINT_RECORDS, numPoints);
-        assertEquals(19675, classifications[1]);    // unclassified
-        assertEquals(402812, classifications[2]);   // ground
-        assertEquals(75049, classifications[5]);    // high vegetation
+        assertEquals(0, classifications[1]);        // unclassified
+        assertEquals(49355, classifications[2]);    // ground
+        assertEquals(3895, classifications[3]);     // low vegetation
+        assertEquals(11792, classifications[4]);    // medium vegetation
+        assertEquals(141722, classifications[5]);   // high vegetation
+        assertEquals(58609, classifications[12]);   // overlap/reserved
     }
 
     @Test
     public void insideTile() throws Exception {
         LASReader reader = new LASReader(laz)
-                .insideTile(1442000, 378000, 1000);
+                .insideTile(2669450, 1257400, 40);
 
         int minX = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE;
@@ -85,26 +88,26 @@ public class LASReaderTest {
         long numPoints = 0;
         for (LASPoint p : reader.getPoints()) {
             minX = Math.min(minX, p.getX());
-            assertTrue(minX >= 144200000);
+            assertTrue(minX >= 266945000);
             maxX = Math.max(maxX, p.getX());
-            assertTrue(maxX <= 144300000);
+            assertTrue(maxX <= 266949000);
             minY = Math.min(minY, p.getY());
-            assertTrue(minY >= 37800000);
+            assertTrue(minY >= 125740000);
             maxY = Math.max(maxY, p.getY());
-            assertTrue(maxY <= 37900000);
+            assertTrue(maxY <= 125744000);
             numPoints++;
         }
-        assertEquals(16032, numPoints);
-        assertEquals(144200003, minX);
-        assertEquals(144299990, maxX);
-        assertEquals(37800009, minY);
-        assertEquals(37899987, maxY);
+        assertEquals(49901, numPoints);
+        assertEquals(266945817, minX);
+        assertEquals(266948999, maxX);
+        assertEquals(125740000, minY);
+        assertEquals(125743999, maxY);
     }
 
     @Test
     public void insideRectangle() throws Exception {
         LASReader reader = new LASReader(laz)
-                .insideRectangle(1441000, 376000, 1443000, 377000);
+                .insideRectangle(2669450, 1257390, 2669480, 1257450);
 
         int minX = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE;
@@ -113,26 +116,26 @@ public class LASReaderTest {
         long numPoints = 0;
         for (LASPoint p : reader.getPoints()) {
             minX = Math.min(minX, p.getX());
-            assertTrue(minX >= 144100000);
+            assertTrue(minX >= 266945000);
             maxX = Math.max(maxX, p.getX());
-            assertTrue(maxX <= 144300000);
+            assertTrue(maxX <= 266948000);
             minY = Math.min(minY, p.getY());
-            assertTrue(minY >= 37600000);
+            assertTrue(minY >= 125739000);
             maxY = Math.max(maxY, p.getY());
-            assertTrue(maxY <= 37700000);
+            assertTrue(maxY <= 125745000);
             numPoints++;
         }
-        assertEquals(33725, numPoints);
-        assertEquals(144100002, minX);
-        assertEquals(144299997, maxX);
-        assertEquals(37600000, minY);
-        assertEquals(37699993, maxY);
+        assertEquals(38411, numPoints);
+        assertEquals(266945287, minX);
+        assertEquals(266947999, maxX);
+        assertEquals(125740433, minY);
+        assertEquals(125744999, maxY);
     }
 
     @Test
     public void insideCircle() throws Exception {
         LASReader reader = new LASReader(laz)
-                .insideCircle(1442000, 378000, 500);
+                .insideCircle(2669465, 1257440, 20);
 
         int minX = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE;
@@ -146,10 +149,10 @@ public class LASReaderTest {
             maxY = Math.max(maxY, p.getY());
             numPoints++;
         }
-        assertEquals(11876, numPoints);
-        assertEquals(144150129, minX);
-        assertEquals(144249977, maxX);
-        assertEquals(37750346, minY);
-        assertEquals(37849678, maxY);
+        assertEquals(53230, numPoints);
+        assertEquals(266945079, minX);
+        assertEquals(266948497, maxX);
+        assertEquals(125742060, minY);
+        assertEquals(125745999, maxY);
     }
 }
