@@ -242,7 +242,7 @@ public class LASwriterTXT extends LASwriter {
             }
         }
 
-        if (this.parse_string == null)
+        if (this.parse_string == null || this.parse_string.isEmpty())
         {
             if (header.point_data_format == 1 || header.point_data_format == 4)
             {
