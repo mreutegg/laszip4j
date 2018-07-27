@@ -14,3 +14,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses />.
 script: mvn --batch-mode install
 language: java
+cache:
+  directories:
+  - $HOME/.m2
