@@ -7,7 +7,7 @@ This is a Java port of the [LASzip](https://github.com/LASzip/LASzip) and
 The port to Java is *not* complete. Many classes are stubs only and have not
 been ported. The main driver was to have a Java implementation of the laszip 
 utility and be able to unpack LAZ files for 
-[Canton of Zurich](http://geolion.zh.ch/geodatensatz/show?nbid=2606)
+[Canton of Zurich](http://geolion.zh.ch/geodatensatz/2618)
 in Switzerland, which works fine.
 
 Usage is the same as with the native laszip utility, but invoked as a runnable
