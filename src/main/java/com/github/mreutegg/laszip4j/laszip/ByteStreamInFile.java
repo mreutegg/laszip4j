@@ -28,12 +28,26 @@ public class ByteStreamInFile extends ByteStreamInDataInput {
 
     private final RandomAccessFile file;
 
-    private final MMappedDataInput in;
+    private final RandomAccessDataInput in;
 
     public ByteStreamInFile(RandomAccessFile file) {
-        super(new MMappedDataInput(file));
+        super(createRandomAccessDataInput(file));
         this.file = file;
-        this.in = (MMappedDataInput) super.dataIn;
+        this.in = (RandomAccessDataInput) super.dataIn;
+    }
+
+    private static RandomAccessDataInput createRandomAccessDataInput(RandomAccessFile file) {
+        long length;
+        try {
+            length = file.length();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        if (length > Integer.MAX_VALUE) {
+            return new RandomAccessFileDataInput(file);
+        } else {
+            return new MMappedDataInput(file);
+        }
     }
 
     @Override
@@ -73,33 +87,11 @@ public class ByteStreamInFile extends ByteStreamInDataInput {
         file.close();
     }
 
-    private static class MMappedDataInput implements DataInput {
-
-        private final MappedByteBuffer buffer;
-
-        MMappedDataInput (RandomAccessFile file) {
-            try {
-                this.buffer = file.getChannel().map(READ_ONLY, 0, file.length());
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        }
+    private static abstract class RandomAccessDataInput implements DataInput {
 
         @Override
         public void readFully(byte[] b) throws IOException {
             readFully(b, 0, b.length);
-        }
-
-        @Override
-        public void readFully(byte[] b, int off, int len) throws IOException {
-            buffer.get(b, off, len);
-        }
-
-        @Override
-        public int skipBytes(int n) throws IOException {
-            int skip = Math.min(buffer.remaining(), n);
-            buffer.position(buffer.position() + skip);
-            return skip;
         }
 
         @Override
@@ -108,23 +100,38 @@ public class ByteStreamInFile extends ByteStreamInDataInput {
         }
 
         @Override
-        public byte readByte() throws IOException {
-            return buffer.get();
+        public float readFloat() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public double readDouble() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String readLine() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String readUTF() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public short readShort() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int readUnsignedShort() {
+            throw new UnsupportedOperationException();
         }
 
         @Override
         public int readUnsignedByte() throws IOException {
             return Byte.toUnsignedInt(readByte());
-        }
-
-        @Override
-        public short readShort() throws IOException {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int readUnsignedShort() throws IOException {
-            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -148,24 +155,38 @@ public class ByteStreamInFile extends ByteStreamInDataInput {
             return ((long)(readInt()) << 32) + (readInt() & 0xFFFFFFFFL);
         }
 
-        @Override
-        public float readFloat() throws IOException {
-            throw new UnsupportedOperationException();
+        abstract long position();
+
+        abstract void position(long position);
+    }
+
+    private static class MMappedDataInput extends RandomAccessDataInput {
+
+        private final MappedByteBuffer buffer;
+
+        MMappedDataInput (RandomAccessFile file) {
+            try {
+                this.buffer = file.getChannel().map(READ_ONLY, 0, file.length());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         }
 
         @Override
-        public double readDouble() throws IOException {
-            throw new UnsupportedOperationException();
+        public void readFully(byte[] b, int off, int len) {
+            buffer.get(b, off, len);
         }
 
         @Override
-        public String readLine() throws IOException {
-            throw new UnsupportedOperationException();
+        public int skipBytes(int n) {
+            int skip = Math.min(buffer.remaining(), n);
+            buffer.position(buffer.position() + skip);
+            return skip;
         }
 
         @Override
-        public String readUTF() throws IOException {
-            throw new UnsupportedOperationException();
+        public byte readByte() {
+            return buffer.get();
         }
 
         public long position() {
@@ -177,6 +198,52 @@ public class ByteStreamInFile extends ByteStreamInDataInput {
                 throw new IllegalArgumentException("position > " + Integer.MAX_VALUE + ": " + position);
             }
             buffer.position((int) position);
+        }
+    }
+
+    private static class RandomAccessFileDataInput extends RandomAccessDataInput {
+
+        private final RandomAccessFile file;
+
+        RandomAccessFileDataInput(RandomAccessFile file) {
+            this.file = file;
+        }
+
+        @Override
+        public void readFully(byte[] b, int off, int len) throws IOException {
+            file.readFully(b, off, len);
+        }
+
+        @Override
+        public int skipBytes(int n) throws IOException {
+            long pos = file.getFilePointer();
+            long remaining = file.length() - pos;
+            long skip = Math.min(remaining, n);
+            position(pos + skip);
+            return (int) skip;
+        }
+
+        @Override
+        public byte readByte() throws IOException {
+            return file.readByte();
+        }
+
+        @Override
+        public long position() {
+            try {
+                return file.getFilePointer();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+
+        @Override
+        public void position(long position) {
+            try {
+                file.seek(position);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         }
     }
 }
