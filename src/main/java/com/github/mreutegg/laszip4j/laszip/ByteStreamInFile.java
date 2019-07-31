@@ -16,6 +16,8 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
+import it.unimi.dsi.io.ByteBufferInputStream;
+
 import java.io.DataInput;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -75,11 +77,11 @@ public class ByteStreamInFile extends ByteStreamInDataInput {
 
     private static class MMappedDataInput implements DataInput {
 
-        private final MappedByteBuffer buffer;
+        private final ByteBufferInputStream buffer;
 
         MMappedDataInput (RandomAccessFile file) {
             try {
-                this.buffer = file.getChannel().map(READ_ONLY, 0, file.length());
+                this.buffer = ByteBufferInputStream.map(file.getChannel());
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
@@ -92,12 +94,12 @@ public class ByteStreamInFile extends ByteStreamInDataInput {
 
         @Override
         public void readFully(byte[] b, int off, int len) throws IOException {
-            buffer.get(b, off, len);
+            buffer.read(b, off, len);
         }
 
         @Override
         public int skipBytes(int n) throws IOException {
-            int skip = Math.min(buffer.remaining(), n);
+            int skip = Math.min(buffer.available(), n);
             buffer.position(buffer.position() + skip);
             return skip;
         }
@@ -109,7 +111,7 @@ public class ByteStreamInFile extends ByteStreamInDataInput {
 
         @Override
         public byte readByte() throws IOException {
-            return buffer.get();
+            return (byte) buffer.read();
         }
 
         @Override
@@ -173,10 +175,7 @@ public class ByteStreamInFile extends ByteStreamInDataInput {
         }
 
         public void position(long position) {
-            if (position > Integer.MAX_VALUE) {
-                throw new IllegalArgumentException("position > " + Integer.MAX_VALUE + ": " + position);
-            }
-            buffer.position((int) position);
+            buffer.position(position);
         }
     }
 }
