@@ -362,7 +362,7 @@ public class LASfilter {
                             fprintf(stderr,"ERROR: '%s' needs 4 arguments: min_X min_Y max_X max_Y\n", argv[i]);
                             return FALSE;
                         }
-                        add_criterion(new LAScriterionKeepXY(atoi(argv[i+1]), atoi(argv[i+2]), atoi(argv[i+3]), atoi(argv[i+4])));
+                        add_criterion(new LAScriterionKeepXYInt(atoi(argv[i+1]), atoi(argv[i+2]), atoi(argv[i+3]), atoi(argv[i+4])));
                         argv[i]=""; argv[i+1]=""; argv[i+2]=""; argv[i+3]=""; argv[i+4]=""; i+=4;
                     }
                     else if (strcmp(argv[i],"-keep_X") == 0)
@@ -372,7 +372,7 @@ public class LASfilter {
                             fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_X max_X\n", argv[i]);
                             return FALSE;
                         }
-                        add_criterion(new LAScriterionKeepX(atoi(argv[i+1]), atoi(argv[i+2])));
+                        add_criterion(new LAScriterionKeepXInt(atoi(argv[i+1]), atoi(argv[i+2])));
                         argv[i]=""; argv[i+1]=""; argv[i+2]=""; i+=2;
                     }
                 }
@@ -383,7 +383,7 @@ public class LASfilter {
                         fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_Y max_Y\n", argv[i]);
                         return FALSE;
                     }
-                    add_criterion(new LAScriterionKeepY(atoi(argv[i+1]), atoi(argv[i+2])));
+                    add_criterion(new LAScriterionKeepYInt(atoi(argv[i+1]), atoi(argv[i+2])));
                     argv[i]=""; argv[i+1]=""; argv[i+2]=""; i+=2;
                 }
                 else if (strcmp(argv[i],"-keep_Z") == 0)
@@ -393,7 +393,7 @@ public class LASfilter {
                         fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_Z max_Z\n", argv[i]);
                         return FALSE;
                     }
-                    add_criterion(new LAScriterionKeepZ(atoi(argv[i+1]), atoi(argv[i+2])));
+                    add_criterion(new LAScriterionKeepZInt(atoi(argv[i+1]), atoi(argv[i+2])));
                     argv[i]=""; argv[i+1]=""; argv[i+2]=""; i+=2;
                 }
                 else if (strcmp(argv[i],"-keep_tile") == 0)
@@ -944,7 +944,7 @@ public class LASfilter {
                             fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_X max_X\n", argv[i]);
                             return FALSE;
                         }
-                        add_criterion(new LAScriterionDropX(atoi(argv[i+1]), atoi(argv[i+2])));
+                        add_criterion(new LAScriterionDropXInt(atoi(argv[i+1]), atoi(argv[i+2])));
                         argv[i]=""; argv[i+1]=""; argv[i+2]=""; i+=2;
                     }
                     else if (strcmp(argv[i],"-drop_X_below") == 0)
@@ -954,7 +954,7 @@ public class LASfilter {
                             fprintf(stderr,"ERROR: '%s' needs 1 argument: min_X\n", argv[i]);
                             return FALSE;
                         }
-                        add_criterion(new LAScriterionDropXBelow(atoi(argv[i+1])));
+                        add_criterion(new LAScriterionDropXIntBelow(atoi(argv[i+1])));
                         argv[i]=""; argv[i+1]=""; i+=1;
                     }
                     else if (strcmp(argv[i],"-drop_X_above") == 0)
@@ -964,7 +964,7 @@ public class LASfilter {
                             fprintf(stderr,"ERROR: '%s' needs 1 argument: max_X\n", argv[i]);
                             return FALSE;
                         }
-                        add_criterion(new LAScriterionDropXAbove(atoi(argv[i+1])));
+                        add_criterion(new LAScriterionDropXIntAbove(atoi(argv[i+1])));
                         argv[i]=""; argv[i+1]=""; i+=1;
                     }
                 }
@@ -977,7 +977,7 @@ public class LASfilter {
                             fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_Y max_Y\n", argv[i]);
                             return FALSE;
                         }
-                        add_criterion(new LAScriterionDropY(atoi(argv[i+1]), atoi(argv[i+2])));
+                        add_criterion(new LAScriterionDropYInt(atoi(argv[i+1]), atoi(argv[i+2])));
                         argv[i]=""; argv[i+1]=""; argv[i+2]=""; i+=2;
                     }
                     else if (strcmp(argv[i],"-drop_Y_below") == 0)
@@ -987,7 +987,7 @@ public class LASfilter {
                             fprintf(stderr,"ERROR: '%s' needs 1 argument: min_Y\n", argv[i]);
                             return FALSE;
                         }
-                        add_criterion(new LAScriterionDropYBelow(atoi(argv[i+1])));
+                        add_criterion(new LAScriterionDropYIntBelow(atoi(argv[i+1])));
                         argv[i]=""; argv[i+1]=""; i+=1;
                     }
                     else if (strcmp(argv[i],"-drop_Y_above") == 0)
@@ -997,7 +997,7 @@ public class LASfilter {
                             fprintf(stderr,"ERROR: '%s' needs 1 argument: max_Y\n", argv[i]);
                             return FALSE;
                         }
-                        add_criterion(new LAScriterionDropYAbove(atoi(argv[i+1])));
+                        add_criterion(new LAScriterionDropYIntAbove(atoi(argv[i+1])));
                         argv[i]=""; argv[i+1]=""; i+=1;
                     }
                 }
@@ -1010,7 +1010,7 @@ public class LASfilter {
                             fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_Z max_Z\n", argv[i]);
                             return FALSE;
                         }
-                        add_criterion(new LAScriterionDropZ(atoi(argv[i+1]), atoi(argv[i+2])));
+                        add_criterion(new LAScriterionDropZInt(atoi(argv[i+1]), atoi(argv[i+2])));
                         argv[i]=""; argv[i+1]=""; argv[i+2]=""; i+=2;
                     }
                     else if (strcmp(argv[i],"-drop_Z_below") == 0)
@@ -1020,7 +1020,7 @@ public class LASfilter {
                             fprintf(stderr,"ERROR: '%s' needs 1 argument: min_Z\n", argv[i]);
                             return FALSE;
                         }
-                        add_criterion(new LAScriterionDropZBelow(atoi(argv[i+1])));
+                        add_criterion(new LAScriterionDropZIntBelow(atoi(argv[i+1])));
                         argv[i]=""; argv[i+1]=""; i+=1;
                     }
                     else if (strcmp(argv[i],"-drop_Z_above") == 0)
@@ -1030,7 +1030,7 @@ public class LASfilter {
                             fprintf(stderr,"ERROR: '%s' needs 1 argument: max_Z\n", argv[i]);
                             return FALSE;
                         }
-                        add_criterion(new LAScriterionDropZAbove(atoi(argv[i+1])));
+                        add_criterion(new LAScriterionDropZIntAbove(atoi(argv[i+1])));
                         argv[i]=""; argv[i+1]=""; i+=1;
                     }
                 }

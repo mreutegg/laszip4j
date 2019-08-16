@@ -2,3 +2,4 @@ target
 *.ipr
 *.iws
 *.iml
+.shelf

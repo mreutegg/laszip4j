@@ -215,123 +215,123 @@ class LAScriterionDropzAbove extends LAScriterion
     double above_z;
 };
 
-class LAScriterionKeepXY extends LAScriterion
+class LAScriterionKeepXYInt extends LAScriterion
 {
     public String name() { return "keep_XY"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d %d %d ", name(), below_X, below_Y, above_X, above_Y); };
     public boolean filter(LASpoint point) { return (point.get_X() < below_X) || (point.get_Y() < below_Y) || (point.get_X() >= above_X) || (point.get_Y() >= above_Y); };
-    LAScriterionKeepXY(int below_X, int below_Y, int above_X, int above_Y) { this.below_X = below_X; this.below_Y = below_Y; this.above_X = above_X; this.above_Y = above_Y; };
+    LAScriterionKeepXYInt(int below_X, int below_Y, int above_X, int above_Y) { this.below_X = below_X; this.below_Y = below_Y; this.above_X = above_X; this.above_Y = above_Y; };
     int below_X, below_Y, above_X, above_Y;
 };
 
-class LAScriterionKeepX extends LAScriterion
+class LAScriterionKeepXInt extends LAScriterion
 {
     public String name() { return "keep_X"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_X, above_X); };
     public boolean filter(LASpoint point) { return (point.get_X() < below_X) || (above_X <= point.get_X()); };
-    LAScriterionKeepX(int below_X, int above_X) { this.below_X = below_X; this.above_X = above_X; };
+    LAScriterionKeepXInt(int below_X, int above_X) { this.below_X = below_X; this.above_X = above_X; };
     int below_X, above_X;
 };
 
-class LAScriterionDropX extends LAScriterion
+class LAScriterionDropXInt extends LAScriterion
 {
     public String name() { return "drop_X"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_X, above_X); };
     public boolean filter(LASpoint point) { return ((below_X <= point.get_X()) && (point.get_X() < above_X)); };
-    LAScriterionDropX(int below_X, int above_X) { this.below_X = below_X; this.above_X = above_X; };
+    LAScriterionDropXInt(int below_X, int above_X) { this.below_X = below_X; this.above_X = above_X; };
     int below_X;
     int above_X;
 };
 
-class LAScriterionKeepY extends LAScriterion
+class LAScriterionKeepYInt extends LAScriterion
 {
     public String name() { return "keep_Y"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Y, above_Y); };
     public boolean filter(LASpoint point) { return (point.get_Y() < below_Y) || (above_Y <= point.get_Y()); };
-    LAScriterionKeepY(int below_Y, int above_Y) { this.below_Y = below_Y; this.above_Y = above_Y; };
+    LAScriterionKeepYInt(int below_Y, int above_Y) { this.below_Y = below_Y; this.above_Y = above_Y; };
     int below_Y, above_Y;
 };
 
-class LAScriterionDropY extends LAScriterion
+class LAScriterionDropYInt extends LAScriterion
 {
     public String name() { return "drop_Y"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Y, above_Y); };
     public boolean filter(LASpoint point) { return ((below_Y <= point.get_Y()) && (point.get_Y() < above_Y)); };
-    LAScriterionDropY(int below_Y, int above_Y) { this.below_Y = below_Y; this.above_Y = above_Y; };
+    LAScriterionDropYInt(int below_Y, int above_Y) { this.below_Y = below_Y; this.above_Y = above_Y; };
     int below_Y;
     int above_Y;
 };
 
-class LAScriterionKeepZ extends LAScriterion
+class LAScriterionKeepZInt extends LAScriterion
 {
     public String name() { return "keep_Z"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Z, above_Z); };
     public boolean filter(LASpoint point) { return (point.get_Z() < below_Z) || (above_Z <= point.get_Z()); };
-    LAScriterionKeepZ(int below_Z, int above_Z) { this.below_Z = below_Z; this.above_Z = above_Z; };
+    LAScriterionKeepZInt(int below_Z, int above_Z) { this.below_Z = below_Z; this.above_Z = above_Z; };
     int below_Z, above_Z;
 };
 
-class LAScriterionDropZ extends LAScriterion
+class LAScriterionDropZInt extends LAScriterion
 {
     public String name() { return "drop_Z"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s %d %d ", name(), below_Z, above_Z); };
     public boolean filter(LASpoint point) { return ((below_Z <= point.get_Z()) && (point.get_Z() < above_Z)); };
-    LAScriterionDropZ(int below_Z, int above_Z) { this.below_Z = below_Z; this.above_Z = above_Z; };
+    LAScriterionDropZInt(int below_Z, int above_Z) { this.below_Z = below_Z; this.above_Z = above_Z; };
     int below_Z;
     int above_Z;
 };
 
-class LAScriterionDropXBelow extends LAScriterion
+class LAScriterionDropXIntBelow extends LAScriterion
 {
     public String name() { return "drop_X_below"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_X); };
     public boolean filter(LASpoint point) { return (point.get_X() < below_X); };
-    LAScriterionDropXBelow(int below_X) { this.below_X = below_X; };
+    LAScriterionDropXIntBelow(int below_X) { this.below_X = below_X; };
     int below_X;
 };
 
-class LAScriterionDropXAbove extends LAScriterion
+class LAScriterionDropXIntAbove extends LAScriterion
 {
     public String name() { return "drop_X_above"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_X); };
     public boolean filter(LASpoint point) { return (point.get_X() >= above_X); };
-    LAScriterionDropXAbove(int above_X) { this.above_X = above_X; };
+    LAScriterionDropXIntAbove(int above_X) { this.above_X = above_X; };
     int above_X;
 };
 
-class LAScriterionDropYBelow extends LAScriterion
+class LAScriterionDropYIntBelow extends LAScriterion
 {
     public String name() { return "drop_Y_below"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_Y); };
     public boolean filter(LASpoint point) { return (point.get_Y() < below_Y); };
-    LAScriterionDropYBelow(int below_Y) { this.below_Y = below_Y; };
+    LAScriterionDropYIntBelow(int below_Y) { this.below_Y = below_Y; };
     int below_Y;
 };
 
-class LAScriterionDropYAbove extends LAScriterion
+class LAScriterionDropYIntAbove extends LAScriterion
 {
     public String name() { return "drop_Y_above"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_Y); };
     public boolean filter(LASpoint point) { return (point.get_Y() >= above_Y); };
-    LAScriterionDropYAbove(int above_Y) { this.above_Y = above_Y; };
+    LAScriterionDropYIntAbove(int above_Y) { this.above_Y = above_Y; };
     int above_Y;
 };
 
-class LAScriterionDropZBelow extends LAScriterion
+class LAScriterionDropZIntBelow extends LAScriterion
 {
     public String name() { return "drop_Z_below"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), below_Z); };
     public boolean filter(LASpoint point) { return (point.get_Z() < below_Z); };
-    LAScriterionDropZBelow(int below_Z) { this.below_Z = below_Z; };
+    LAScriterionDropZIntBelow(int below_Z) { this.below_Z = below_Z; };
     int below_Z;
 };
 
-class LAScriterionDropZAbove extends LAScriterion
+class LAScriterionDropZIntAbove extends LAScriterion
 {
     public String name() { return "drop_Z_above"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s %d ", name(), above_Z); };
     public boolean filter(LASpoint point) { return (point.get_Z() >= above_Z); };
-    LAScriterionDropZAbove(int above_Z) { this.above_Z = above_Z; };
+    LAScriterionDropZIntAbove(int above_Z) { this.above_Z = above_Z; };
     int above_Z;
 };
 
