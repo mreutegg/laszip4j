@@ -72,7 +72,8 @@ public class LASreadItemCompressed_RGB12_v2 extends LASreadItemCompressed {
         if ((sym & (1 << 0)) != 0)
         {
             corr = (byte) dec.decodeSymbol(m_rgb_diff_0);
-            item.putChar(0, (char)U8_FOLD(corr + (last_item[0]&255)));
+            byte b = U8_FOLD(corr + (last_item[0] & 255));
+            item.putChar(0, (char) Byte.toUnsignedInt(b));
         }
         else
         {
@@ -81,7 +82,8 @@ public class LASreadItemCompressed_RGB12_v2 extends LASreadItemCompressed {
         if ((sym & (1 << 1)) != 0)
         {
             corr = (byte) dec.decodeSymbol(m_rgb_diff_1);
-            item.putChar(0, (char) (item.getChar(0) | (((char)U8_FOLD(corr + (last_item[0]>>>8))) << 8)));
+            byte b = U8_FOLD(corr + (last_item[0] >>> 8));
+            item.putChar(0, (char) (item.getChar(0) | (((char) Byte.toUnsignedInt(b)) << 8)));
         }
         else
         {
@@ -93,7 +95,8 @@ public class LASreadItemCompressed_RGB12_v2 extends LASreadItemCompressed {
             if ((sym & (1 << 2)) != 0)
             {
                 corr = (byte) dec.decodeSymbol(m_rgb_diff_2);
-                item.putChar(2, (char)U8_FOLD(corr + U8_CLAMP(diff+(last_item[1]&255))));
+                byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item[1] & 255)));
+                item.putChar(2, (char) Byte.toUnsignedInt(b));
             }
             else
             {
@@ -103,7 +106,8 @@ public class LASreadItemCompressed_RGB12_v2 extends LASreadItemCompressed {
             {
                 corr = (byte) dec.decodeSymbol(m_rgb_diff_4);
                 diff = (diff + ((item.getChar(2)&0x00FF) - (last_item[1]&0x00FF))) / 2;
-                item.putChar(4, (char)U8_FOLD(corr + U8_CLAMP(diff+(last_item[2]&255))));
+                byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item[2] & 255)));
+                item.putChar(4, (char) Byte.toUnsignedInt(b));
             }
             else
             {
@@ -113,7 +117,8 @@ public class LASreadItemCompressed_RGB12_v2 extends LASreadItemCompressed {
             if ((sym & (1 << 3)) != 0)
             {
                 corr = (byte) dec.decodeSymbol(m_rgb_diff_3);
-                item.putChar(2, (char) (item.getChar(2) | (((char)U8_FOLD(corr + U8_CLAMP(diff+(last_item[1]>>>8))))<<8)));
+                byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item[1] >>> 8)));
+                item.putChar(2, (char) (item.getChar(2) | (((char) Byte.toUnsignedInt(b)) << 8)));
             }
             else
             {
@@ -123,7 +128,8 @@ public class LASreadItemCompressed_RGB12_v2 extends LASreadItemCompressed {
             {
                 corr = (byte) dec.decodeSymbol(m_rgb_diff_5);
                 diff = (diff + ((item.getChar(2)>>>8) - (last_item[1]>>>8))) / 2;
-                item.putChar(4, (char) (item.getChar(4) | (((char)U8_FOLD(corr + U8_CLAMP(diff+(last_item[2]>>>8))))<<8)));
+                byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item[2] >>> 8)));
+                item.putChar(4, (char) (item.getChar(4) | (((char) Byte.toUnsignedInt(b)) << 8)));
             }
             else
             {
