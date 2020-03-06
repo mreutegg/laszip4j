@@ -132,9 +132,7 @@ public class LASreadPoint {
                     readers_raw[i] = new LASreadItemRaw_BYTE(items[i].size);
                     break;
                 case POINT14:
-                    // TODO: implement LASreadItemRaw_POINT14 for big endian
-                    if (!IS_LITTLE_ENDIAN())
-                        return FALSE;
+                    readers_raw[i] = new LASreadItemRaw_POINT14();
                     break;
                 case RGBNIR14:
                     readers_raw[i] = new LASreadItemRaw_RGBNIR14();

@@ -21,8 +21,10 @@ public interface MyDefs {
     int I32_MIN = Integer.MIN_VALUE;
 
     byte U8_MIN = 0x0;
+    byte I8_MIN = Byte.MIN_VALUE;
 
     byte U8_MAX = (byte) 0xFF; // 255
+    byte I8_MAX = Byte.MAX_VALUE;
     byte U8_MAX_MINUS_ONE = (byte) 0xFE; // 254
     char U8_MAX_PLUS_ONE = 0x0100;     // 256
 
@@ -33,6 +35,10 @@ public interface MyDefs {
 
     static int U8_CLAMP(int n) {
         return (((n) <= U8_MIN) ? U8_MIN : (((n) >= Byte.toUnsignedInt(U8_MAX)) ? U8_MAX : ((byte)(n))));
+    }
+
+    static int I8_CLAMP(int n) {
+        return (((n) <= I8_MIN) ? I8_MIN : (((n) >= I8_MAX) ? I8_MAX : ((byte)(n))));
     }
 
     static short I16_QUANTIZE(float n) {

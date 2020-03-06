@@ -27,38 +27,36 @@ public class LASpoint {
     // these fields contain the data that describe each point
 
     /**
-     * I32 X;
-     * I32 Y;
-     * I32 Z;
-     * U16 intensity;
-     * U8 return_number : 3;
-     * U8 number_of_returns : 3;
-     * U8 scan_direction_flag : 1;
-     * U8 edge_of_flight_line : 1;
-     * U8 classification : 5;
-     * U8 synthetic_flag : 1;
-     * U8 keypoint_flag  : 1;
-     * U8 withheld_flag  : 1;
-     * I8 scan_angle_rank;
-     * U8 user_data;
-     * U16 point_source_ID;
+     * I32 X;                                   0
+     * I32 Y;                                   4
+     * I32 Z;                                   8
+     * U16 intensity;                           12
+     * U8 return_number : 3;                    14
+     * U8 number_of_returns : 3;                14
+     * U8 scan_direction_flag : 1;              14
+     * U8 edge_of_flight_line : 1;              14
+     * U8 classification : 5;                   15
+     * U8 synthetic_flag : 1;                   15
+     * U8 keypoint_flag  : 1;                   15
+     * U8 withheld_flag  : 1;                   15
+     * I8 scan_angle_rank;                      16
+     * U8 user_data;                            17
+     * U16 point_source_ID;                     18
+     * // LAS 1.4 only
+     * I16 extended_scan_angle;                 20
+     * U8 extended_point_type : 2;              22
+     * U8 extended_scanner_channel : 2;         22
+     * U8 extended_classification_flags : 4;    22
+     * U8 extended_classification;              23
+     * U8 extended_return_number : 4;           24
+     * U8 extended_number_of_returns : 4;       24
+     * // for 8 byte alignment of the GPS time
+     * U8 dummy[3];                             25
+     * // LASlib only
+     * U32 deleted_flag;                        28
+     * F64 gps_time;                            32
      */
-    private final ByteBuffer point10 = ByteBuffer.allocate(20);
-
-    // LAS 1.4 only
-    private short extended_scan_angle;
-    private byte extended_point_type;            // :2
-    private byte extended_scanner_channel;       // :2
-    private byte extended_classification_flags;  // :4
-    private byte extended_classification;
-    private byte extended_return_number;         // :4
-    private byte extended_number_of_returns;     // :4
-
-    // for 8 byte alignment of the GPS time
-    public byte[] dummy = new byte[3];
-
-    // LASlib only
-    private int deleted_flag; // unsigned
+    private final ByteBuffer point10 = ByteBuffer.allocate(40);
 
     private ByteBuffer gps_time = ByteBuffer.allocate(8); // double
     // 3 rgb values & 1 nir value
@@ -83,6 +81,7 @@ public class LASpoint {
     // these fields describe the point format LAS specific
 
     public boolean have_gps_time;
+    public boolean have_gps_time11;
     public boolean have_rgb;
     public boolean have_nir;
     public boolean have_wavepacket;
@@ -210,6 +209,7 @@ public class LASpoint {
                     break;
                 case GPSTIME11:
                     have_gps_time = TRUE;
+                    have_gps_time11 = TRUE;
                     this.point[i] = ByteBuffer.wrap(this.gps_time.array());
                     break;
                 case RGBNIR14:
@@ -264,6 +264,7 @@ public class LASpoint {
                     break;
                 case GPSTIME11:
                     have_gps_time = TRUE;
+                    have_gps_time11 = TRUE;
                     this.point[u_i] = ByteBuffer.wrap(this.gps_time.array());
                     break;
                 case RGBNIR14:
@@ -417,6 +418,7 @@ public class LASpoint {
         point = null;
 
         have_gps_time = FALSE;
+        have_gps_time11 = FALSE;
         have_rgb = FALSE;
         have_wavepacket = FALSE;
         have_nir = FALSE;
@@ -694,7 +696,7 @@ public class LASpoint {
     public void setReturn_number(byte return_number) {
         byte b = point10.get(14);
         b &= (~ 0b0111);
-        b &= (return_number & 0b0111);
+        b |= (return_number & 0b0111);
         point10.put(14, b);
     }
 
@@ -706,7 +708,7 @@ public class LASpoint {
     public void setNumber_of_returns(byte number_of_returns) {
         byte b = point10.get(14);
         b &= (~ 0b00111000);
-        b &= ((number_of_returns << 3) & 0b00111000);
+        b |= ((number_of_returns << 3) & 0b00111000);
         point10.put(14, b);
     }
 
@@ -718,7 +720,7 @@ public class LASpoint {
     public void setScan_direction_flag(byte scan_direction_flag) {
         byte b = point10.get(14);
         b &= (~ 0b01000000);
-        b &= ((scan_direction_flag << 6) & 0b01000000);
+        b |= ((scan_direction_flag << 6) & 0b01000000);
         point10.put(14, b);
     }
 
@@ -730,7 +732,7 @@ public class LASpoint {
     public void setEdge_of_flight_line(byte edge_of_flight_line) {
         byte b = point10.get(14);
         b &= (~ 0b10000000);
-        b &= ((edge_of_flight_line << 7) & 0b10000000);
+        b |= ((edge_of_flight_line << 7) & 0b10000000);
         point10.put(14, b);
     }
 
@@ -742,7 +744,7 @@ public class LASpoint {
     public void setClassification(byte classification) {
         byte b = point10.get(15);
         b &= (~ 0b00011111);
-        b &= (classification & 0b00011111);
+        b |= (classification & 0b00011111);
         point10.put(15, b);
     }
 
@@ -754,7 +756,7 @@ public class LASpoint {
     public void setSynthetic_flag(byte synthetic_flag) {
         byte b = point10.get(15);
         b &= (~ 0b00100000);
-        b &= ((synthetic_flag << 5) & 0b00100000);
+        b |= ((synthetic_flag << 5) & 0b00100000);
         point10.put(15, b);
     }
 
@@ -766,7 +768,7 @@ public class LASpoint {
     public void setKeypoint_flag(byte keypoint_flag) {
         byte b = point10.get(15);
         b &= (~ 0b01000000);
-        b &= ((keypoint_flag << 6) & 0b01000000);
+        b |= ((keypoint_flag << 6) & 0b01000000);
         point10.put(15, b);
     }
 
@@ -778,7 +780,7 @@ public class LASpoint {
     public void setWithheld_flag(byte withheld_flag) {
         byte b = point10.get(15);
         b &= (~ 0b10000000);
-        b &= ((withheld_flag << 7) & 0b10000000);
+        b |= ((withheld_flag << 7) & 0b10000000);
         point10.put(15, b);
     }
 
@@ -807,75 +809,100 @@ public class LASpoint {
     }
 
     public short getExtended_scan_angle() {
-        return extended_scan_angle;
+        return point10.getShort(20);
     }
 
     public void setExtended_scan_angle(short extended_scan_angle) {
-        this.extended_scan_angle = extended_scan_angle;
+        point10.putShort(20, extended_scan_angle);
     }
 
     public byte getExtended_point_type() {
-        return extended_point_type;
+        byte b = point10.get(22);
+        return (byte) (b & 0b0011);
     }
 
     public void setExtended_point_type(byte extended_point_type) {
-        this.extended_point_type = extended_point_type;
+        byte b = point10.get(22);
+        b &= (~ 0b0011);
+        b |= (extended_point_type & 0b0011);
+        point10.put(22, b);
     }
 
     public byte getExtended_scanner_channel() {
-        return extended_scanner_channel;
+        byte b = point10.get(22);
+        return (byte) ((b >>> 2) & 0b0011);
     }
 
     public void setExtended_scanner_channel(byte extended_scanner_channel) {
-        this.extended_scanner_channel = extended_scanner_channel;
+        byte b = point10.get(22);
+        b &= (~ 0b1100);
+        b |= ((extended_scanner_channel << 2) & 0b1100);
+        point10.put(22, b);
     }
 
     public byte getExtended_classification_flags() {
-        return extended_classification_flags;
+        byte b = point10.get(22);
+        return (byte) ((b >>> 4) & 0b1111);
     }
 
     public void setExtended_classification_flags(byte extended_classification_flags) {
-        this.extended_classification_flags = extended_classification_flags;
+        byte b = point10.get(22);
+        b &= (~ 0b11110000);
+        b |= ((extended_classification_flags << 4) & 0b11110000);
+        point10.put(22, b);
     }
 
     public byte getExtended_classification() {
-        return extended_classification;
+        return point10.get(23);
     }
 
     public void setExtended_classification(byte extended_classification) {
-        this.extended_classification = extended_classification;
+        point10.put(23, extended_classification);
     }
 
     public byte getExtended_return_number() {
-        return extended_return_number;
+        byte b = point10.get(24);
+        return (byte) (b & 0b1111);
     }
 
     public void setExtended_return_number(byte extended_return_number) {
-        this.extended_return_number = extended_return_number;
+        byte b = point10.get(24);
+        b &= (~ 0b1111);
+        b |= (extended_return_number & 0b1111);
+        point10.put(24, b);
     }
 
     public byte getExtended_number_of_returns() {
-        return extended_number_of_returns;
+        byte b = point10.get(24);
+        return (byte) ((b >>> 4) & 0b1111);
     }
 
     public void setExtended_number_of_returns(byte extended_number_of_returns) {
-        this.extended_number_of_returns = extended_number_of_returns;
+        byte b = point10.get(24);
+        b &= (~ 0b11110000);
+        b |= ((extended_number_of_returns << 4) & 0b11110000);
+        point10.put(24, b);
     }
 
     public int getDeleted_flag() {
-        return deleted_flag;
+        return point10.getInt(28);
     }
 
     public void setDeleted_flag(int deleted_flag) {
-        this.deleted_flag = deleted_flag;
+        point10.putInt(28, deleted_flag);
     }
 
     public double getGps_time() {
-        return gps_time.getDouble(0);
+        if (have_gps_time11) {
+            return gps_time.getDouble(0);
+        } else {
+            return point10.getDouble(32);
+        }
     }
 
     public void setGps_time(double gps_time) {
         this.gps_time.putDouble(0, gps_time);
+        point10.putDouble(32, gps_time);
     }
 
     public char getRgb(int index) {
