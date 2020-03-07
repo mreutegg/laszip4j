@@ -17,6 +17,10 @@
 package com.github.mreutegg.laszip4j;
 
 import com.github.mreutegg.laszip4j.laslib.LASheader;
+import com.github.mreutegg.laszip4j.laslib.LASvlr;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.github.mreutegg.laszip4j.laszip.MyDefs.stringFromByteArray;
 
@@ -294,5 +298,13 @@ public final class LASHeader {
         long[] data = new long[header.extended_number_of_points_by_return.length];
         System.arraycopy(header.extended_number_of_points_by_return, 0, data, 0, data.length);
         return data;
+    }
+
+    public Iterable<LASVariableLengthRecord> getVariableLengthRecords() {
+        List<LASVariableLengthRecord> records = new ArrayList<>();
+        for (LASvlr vlr : header.vlrs) {
+            records.add(new LASVariableLengthRecord(vlr));
+        }
+        return records;
     }
 }

@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -123,6 +125,27 @@ public class LASReaderTest {
         assertEquals(4, header.getVersionMinor());
         assertEquals(267, header.getFileCreationDayOfYear());
         assertEquals(2018, header.getFileCreationYear());
+
+        List<LASVariableLengthRecord> vlrs = new ArrayList<>();
+        for (LASVariableLengthRecord vlr : header.getVariableLengthRecords()) {
+            vlrs.add(vlr);
+        }
+        assertEquals(3, vlrs.size());
+        LASVariableLengthRecord vlr = vlrs.get(0);
+        assertEquals("LASF_Projection", vlr.getUserID());
+        assertEquals(2112, vlr.getRecordID());
+        assertEquals("OGC WKT Coordinate System", vlr.getDescription());
+        assertEquals("COMPD_CS[\"NAD83 / Maryland + NAVD88 height - Geoid12B (metre)\",PROJCS[\"NAD83 / Maryland\",GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY[\"EPSG\",\"6269\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4269\"]],PROJECTION[\"Lambert_Conformal_Conic_2SP\"],PARAMETER[\"standard_parallel_1\",39.45],PARAMETER[\"standard_parallel_2\",38.3],PARAMETER[\"latitude_of_origin\",37.66666666666666],PARAMETER[\"central_meridian\",-77],PARAMETER[\"false_easting\",400000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH],AUTHORITY[\"EPSG\",\"26985\"]],VERT_CS[\"NAVD88 height - Geoid12B (metre)\",VERT_DATUM[\"North American Vertical Datum 1988\",2005,AUTHORITY[\"EPSG\",\"5103\"]],HEIGHT_MODEL[\"US Geoid Model 2012B\"],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AUTHORITY[\"EPSG\",\"5703\"]]]", vlr.getDataAsString());
+        vlr = vlrs.get(1);
+        assertEquals("NIIRS10", vlr.getUserID());
+        assertEquals(4, vlr.getRecordID());
+        assertEquals("NIIRS10 Timestamp", vlr.getDescription());
+        assertEquals(10, vlr.getRecordLength());
+        vlr = vlrs.get(2);
+        assertEquals("NIIRS10", vlr.getUserID());
+        assertEquals(1, vlr.getRecordID());
+        assertEquals("NIIRS10 Tile Index", vlr.getDescription());
+        assertEquals(26, vlr.getRecordLength());
 
         int minX = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE;
