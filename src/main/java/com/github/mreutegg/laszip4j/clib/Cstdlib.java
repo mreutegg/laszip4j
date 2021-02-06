@@ -24,7 +24,7 @@ public final class Cstdlib {
 
     private static final long SEED = System.currentTimeMillis();
 
-    private static final Random RANDOM = new SecureRandom();
+    private static final SecureRandom RANDOM = new SecureRandom();
     
     static {
         RANDOM.setSeed(SEED);
