@@ -48,6 +48,12 @@
       <tag>HEAD</tag>
   </scm>
 
+  <properties>
+    <sonar.projectKey>mreutegg_laszip4j</sonar.projectKey>
+    <sonar.organization>mreutegg</sonar.organization>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+  </properties>
+	
     <build>
         <plugins>
 			<plugin>
