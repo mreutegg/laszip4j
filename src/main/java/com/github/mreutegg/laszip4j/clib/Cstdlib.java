@@ -17,6 +17,7 @@
 package com.github.mreutegg.laszip4j.clib;
 
 import java.nio.ByteBuffer;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -53,8 +54,12 @@ public final class Cstdlib {
     }
 
     private static SecureRandom newSecureRandom(ByteBuffer seed) {
-        SecureRandom r = new SecureRandom();
-        r.setSeed(seed.array());
-        return r;
+        try {
+            SecureRandom r = SecureRandom.getInstance("SHA1PRNG");
+            r.setSeed(seed.array());
+            return r;
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException();
+        }
     }
 }
