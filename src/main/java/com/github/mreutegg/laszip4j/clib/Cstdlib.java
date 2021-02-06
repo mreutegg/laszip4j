@@ -16,23 +16,21 @@
  */
 package com.github.mreutegg.laszip4j.clib;
 
+import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.util.Random;
 
 public final class Cstdlib {
 
     public static final int RAND_MAX = Character.MAX_VALUE;
 
-    private static final long SEED = System.currentTimeMillis();
+    private static final ByteBuffer SEED = ByteBuffer.allocate(32)
+            .put(SecureRandom.getSeed(32));
 
-    private static final SecureRandom RANDOM = new SecureRandom();
-    
-    static {
-        RANDOM.setSeed(SEED);
-    }    
+    private static Random RANDOM = newSecureRandom(SEED);
 
     private Cstdlib() {
     }
-
 
     public static double atof(String s) {
         return Double.parseDouble(s.trim());
@@ -43,14 +41,20 @@ public final class Cstdlib {
     }
 
     public static void srand(int seed) {
-        if (seed == 1) {
-            RANDOM.setSeed(SEED);
-        } else {
-            RANDOM.setSeed(seed);
+        ByteBuffer seedBytes = SEED;
+        if (seed != 1) {
+            seedBytes = ByteBuffer.allocate(4).putInt(seed);
         }
+        RANDOM = newSecureRandom(seedBytes);
     }
 
     public static int rand() {
         return RANDOM.nextInt(RAND_MAX + 1);
+    }
+
+    private static SecureRandom newSecureRandom(ByteBuffer seed) {
+        SecureRandom r = new SecureRandom();
+        r.setSeed(seed.array());
+        return r;
     }
 }
