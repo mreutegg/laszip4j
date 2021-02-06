@@ -339,7 +339,7 @@ public class LASindex {
 
             // find LASzip VLR
 
-            long total = lasreader.header.header_size + 2;
+            long total = lasreader.header.header_size + 2L;
             int number_of_variable_length_records = lasreader.header.number_of_variable_length_records + 1 + asInt(lasreader.header.vlr_lastiling != null) + asInt(lasreader.header.vlr_lasoriginal != null);
 
             for (int u = 0; u < number_of_variable_length_records; u++)
