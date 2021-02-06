@@ -752,6 +752,7 @@ public class LASreadOpener {
         if (lasreader == null)
         {
             fprintf(stderr,"ERROR: pointer to LASreader is NULL\n");
+            return FALSE;
         }
 
         // make sure the LASreader was closed
