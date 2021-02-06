@@ -16,15 +16,19 @@
  */
 package com.github.mreutegg.laszip4j.clib;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 public final class Cstdlib {
 
     public static final int RAND_MAX = Character.MAX_VALUE;
 
-    private static long SEED = System.currentTimeMillis();
+    private static final long SEED = System.currentTimeMillis();
 
-    private static final Random RANDOM = new Random(SEED);
+    private static final Random RANDOM = new SecureRandom();
+    
+    static {
+        RANDOM.setSeed(SEED);
+    }    
 
     private Cstdlib() {
     }
