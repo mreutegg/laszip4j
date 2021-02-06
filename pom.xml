@@ -49,6 +49,8 @@
   </scm>
 
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <sonar.projectKey>mreutegg_laszip4j</sonar.projectKey>
     <sonar.organization>mreutegg</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -186,8 +188,4 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
 </project>
