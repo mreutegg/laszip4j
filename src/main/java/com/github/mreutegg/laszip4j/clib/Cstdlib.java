@@ -28,7 +28,7 @@ public final class Cstdlib {
     private static final ByteBuffer SEED = ByteBuffer.allocate(32)
             .put(SecureRandom.getSeed(32));
 
-    private static Random RANDOM = newSecureRandom(SEED);
+    private static Random random = newSecureRandom(SEED);
 
     private Cstdlib() {
     }
@@ -46,11 +46,11 @@ public final class Cstdlib {
         if (seed != 1) {
             seedBytes = ByteBuffer.allocate(4).putInt(seed);
         }
-        RANDOM = newSecureRandom(seedBytes);
+        random = newSecureRandom(seedBytes);
     }
 
     public static int rand() {
-        return RANDOM.nextInt(RAND_MAX + 1);
+        return random.nextInt(RAND_MAX + 1);
     }
 
     private static SecureRandom newSecureRandom(ByteBuffer seed) {
