@@ -14,37 +14,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.mreutegg.laszip4j;
+package com.github.mreutegg.laszip4j.laslib;
 
-import com.github.mreutegg.laszip4j.clib.Cstdlib;
-import org.junit.After;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-public class CstdlibTest {
-
-    @After
-    public void resetSeed() {
-        Cstdlib.srand(1);
-    }
+public class LASreadOpenerTest {
 
     @Test
-    public void srand() {
-        int first = Cstdlib.rand();
-        int second = Cstdlib.rand();
-        Cstdlib.srand(1);
-        assertEquals(first, Cstdlib.rand());
-        assertEquals(second, Cstdlib.rand());
-    }
-
-    @Test
-    public void srandWithSeed() {
-        Cstdlib.srand(42);
-        int first = Cstdlib.rand();
-        int second = Cstdlib.rand();
-        Cstdlib.srand(42);
-        assertEquals(first, Cstdlib.rand());
-        assertEquals(second, Cstdlib.rand());
+    public void reopenWithNullReader() {
+        LASreadOpener o = new LASreadOpener();
+        assertFalse(o.reopen(null, true));
     }
 }
