@@ -15,8 +15,9 @@
 kind: pipeline
 name: default
 
+type: docker
 steps:
 - name: test
   image: maven:3-jdk-8
   commands:
-  - mvn --batch-mode install
+  - mvn -B verify

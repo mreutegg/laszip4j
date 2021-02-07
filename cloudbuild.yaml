@@ -16,4 +16,4 @@ steps:
 - name: gcr.io/cloud-builders/git
   args: ['clone', 'https://github.com/mreutegg/laszip4j.git']
 - name: 'gcr.io/cloud-builders/mvn'
-  args: ['--batch-mode', 'install']
+  args: ['-B', 'verify']
