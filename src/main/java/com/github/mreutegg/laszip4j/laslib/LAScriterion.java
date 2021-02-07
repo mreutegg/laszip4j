@@ -446,6 +446,7 @@ class LAScriterionKeepScanDirectionChange extends LAScriterion
     public String name() { return "keep_scan_direction_change"; };
     public int get_command(StringBuilder string) { return sprintf(string, "-%s ", name()); };
     public boolean filter(LASpoint point) { if (scan_direction_flag == point.getScan_direction_flag()) return TRUE; int s = scan_direction_flag; scan_direction_flag = point.getScan_direction_flag(); return s == -1; };
+    @Override
     public void reset() { scan_direction_flag = -1; };
     LAScriterionKeepScanDirectionChange() { reset(); };
     private int scan_direction_flag;
@@ -831,6 +832,7 @@ class LAScriterionKeepRandomFraction extends LAScriterion
         seed = rand();
         return ((float)seed/(float)RAND_MAX) > fraction;
     };
+    @Override
     public void reset() { seed = 0; };
     LAScriterionKeepRandomFraction(float fraction) { seed = 0; this.fraction = fraction; };
     int seed;
@@ -969,6 +971,7 @@ class LAScriterionThinWithGrid extends LAScriterion
         return FALSE;
         */
     }
+    @Override
     public void reset()
     {
         if (grid_spacing > 0) grid_spacing = -grid_spacing;
@@ -1060,6 +1063,7 @@ class LAScriterionThinWithTime extends LAScriterion
             return TRUE;
         }
     }
+    @Override
     public void reset()
     {
         times.clear();
