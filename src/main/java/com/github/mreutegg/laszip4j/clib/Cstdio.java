@@ -88,7 +88,7 @@ public final class Cstdio {
             return null;
         }
         try {
-            mode = mode.replaceAll("b", "");
+            mode = mode.replace("b", "");
             return new RandomAccessFile(f, mode);
         } catch (FileNotFoundException e) {
             return null;
