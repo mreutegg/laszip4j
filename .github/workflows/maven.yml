@@ -38,3 +38,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: mvn -B -Pcoverage verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+    - name: Upload to Codecov
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: bash <(curl -s https://codecov.io/bash)
