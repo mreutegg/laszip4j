@@ -21,6 +21,7 @@ import static com.github.mreutegg.laszip4j.clib.Cstring.strcmp;
 import static com.github.mreutegg.laszip4j.laslib.LasDefinitions.LAS_TOOLS_VERSION;
 import static com.github.mreutegg.laszip4j.laszip.MyDefs.I16_QUANTIZE;
 import static com.github.mreutegg.laszip4j.laszip.MyDefs.U16_MAX;
+import static com.github.mreutegg.laszip4j.laszip.MyDefs.stringFromByteArray;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
@@ -201,7 +202,7 @@ public class LASwriterCompatibleDown extends LASwriter {
                         }
                         else
                         {
-                            fprintf(stderr,"large EVLR with user ID '%s' and record ID %d with payload size %lld not moved to VLRs.\n", header.evlrs[i].user_id, header.evlrs[i].record_id, header.evlrs[i].record_length_after_header);
+                            fprintf(stderr,"large EVLR with user ID '%s' and record ID %d with payload size %lld not moved to VLRs.\n", stringFromByteArray(header.evlrs[i].user_id), header.evlrs[i].record_id, header.evlrs[i].record_length_after_header);
                         }
                     }
                     else if (strcmp(new String(header.evlrs[i].user_id), "LASF_Projection") == 0)
