@@ -34,6 +34,7 @@ import static com.github.mreutegg.laszip4j.laslib.LasDefinitions.LAS_TOOLS_FORMA
 import static com.github.mreutegg.laszip4j.laslib.LasDefinitions.LAS_TOOLS_FORMAT_LAZ;
 import static com.github.mreutegg.laszip4j.laszip.LASzip.LASZIP_COMPRESSOR_NONE;
 import static com.github.mreutegg.laszip4j.laszip.MyDefs.sizeof;
+import static com.github.mreutegg.laszip4j.laszip.MyDefs.stringFromByteArray;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Double.longBitsToDouble;
@@ -597,7 +598,7 @@ public class LASreaderLAS extends LASreader {
                         }
                         else
                         {
-                            fprintf(stderr,"ERROR: record_length_after_header of VLR %s (%d) is %d instead of 28\n", header.vlrs[i].user_id, header.vlrs[i].record_id, header.vlrs[i].record_length_after_header);
+                            fprintf(stderr,"ERROR: record_length_after_header of VLR %s (%d) is %d instead of 28\n", stringFromByteArray(header.vlrs[i].user_id), header.vlrs[i].record_id, header.vlrs[i].record_length_after_header);
                             return FALSE;
                         }
                     }
@@ -656,7 +657,7 @@ public class LASreaderLAS extends LASreader {
                         }
                         else
                         {
-                            fprintf(stderr,"ERROR: record_length_after_header of VLR %s (%d) is %d instead of 176\n", header.vlrs[i].user_id, header.vlrs[i].record_id, header.vlrs[i].record_length_after_header);
+                            fprintf(stderr,"ERROR: record_length_after_header of VLR %s (%d) is %d instead of 176\n", stringFromByteArray(header.vlrs[i].user_id), header.vlrs[i].record_id, header.vlrs[i].record_length_after_header);
                             return FALSE;
                         }
                     }
@@ -1051,7 +1052,7 @@ public class LASreaderLAS extends LASreader {
                                 }
                                 else
                                 {
-                                    fprintf(stderr,"ERROR: record_length_after_header of EVLR %s (%d) is %d instead of 28\n", header.evlrs[i].user_id, header.evlrs[i].record_id, (int)header.evlrs[i].record_length_after_header);
+                                    fprintf(stderr,"ERROR: record_length_after_header of EVLR %s (%d) is %d instead of 28\n", stringFromByteArray(header.evlrs[i].user_id), header.evlrs[i].record_id, (int)header.evlrs[i].record_length_after_header);
                                     return FALSE;
                                 }
                             }
