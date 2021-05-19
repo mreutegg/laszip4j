@@ -305,6 +305,6 @@ public final class LASHeader {
         for (LASvlr vlr : header.vlrs) {
             records.add(new LASVariableLengthRecord(vlr));
         }
-        return records;
+        return records.subList(0, getNumberOfVariableLengthRecords());
     }
 }

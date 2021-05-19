@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -44,9 +45,9 @@ public class LASReaderTest {
     private static final String LAS_BASE_URL = "https://dc-lidar-2018.s3.amazonaws.com/Classified_LAS";
     private static final int LAS_NUM_POINT_RECORDS = 1653361;
 
-    private File target = new File("target");
-    private File laz = new File(target, LAZ_NAME);
-    private File las = new File(target, LAS_NAME);
+    private final File target = new File("target");
+    private final File laz = new File(target, LAZ_NAME);
+    private final File las = new File(target, LAS_NAME);
 
     @Before
     public void before() throws Exception {
@@ -76,6 +77,8 @@ public class LASReaderTest {
     public void read() {
         LASReader reader = new LASReader(laz);
         LASHeader header = reader.getHeader();
+
+        assertEquals(header.getNumberOfVariableLengthRecords(), StreamSupport.stream(header.getVariableLengthRecords().spliterator(), false).count());
 
         long[] classifications = new long[Byte.MAX_VALUE];
         assertEquals("las_reframe.exe", header.getGeneratingSoftware());
