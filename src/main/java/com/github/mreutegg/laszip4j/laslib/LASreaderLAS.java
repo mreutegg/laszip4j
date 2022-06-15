@@ -1378,7 +1378,7 @@ public class LASreaderLAS extends LASreader {
         }
     }
 
-    LASreaderLAS()
+    public LASreaderLAS()
     {
         file = null;
         stream = null;

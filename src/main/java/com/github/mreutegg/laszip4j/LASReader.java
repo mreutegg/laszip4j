@@ -18,13 +18,14 @@ package com.github.mreutegg.laszip4j;
 
 import com.github.mreutegg.laszip4j.laslib.LASreadOpener;
 import com.github.mreutegg.laszip4j.laslib.LASreader;
+import com.github.mreutegg.laszip4j.laslib.LASreaderLAS;
 import com.github.mreutegg.laszip4j.laszip.LASpoint;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A utility for reading LAS/LAZ files.
@@ -32,6 +33,8 @@ import java.util.NoSuchElementException;
 public final class LASReader {
 
     private final File file;
+
+    private final InputStream is;
 
     private Constraint constraint = new None();
 
@@ -42,7 +45,12 @@ public final class LASReader {
      * @param file the file to read from.
      */
     public LASReader(File file) {
+        this(requireNonNull(file), null);
+    }
+
+    private LASReader(File file, InputStream is) {
         this.file = file;
+        this.is = is;
     }
 
     /**
@@ -89,6 +97,16 @@ public final class LASReader {
     }
 
     /**
+     * Read LAS points from an input stream of a raw .las file.
+     *
+     * @param is the input stream.
+     * @return the LAS points.
+     */
+    public static Iterable<LASPoint> getPoints(InputStream is) {
+        return new LASReader(null, new BufferedInputStream(requireNonNull(is))).getPoints();
+    }
+
+    /**
      * @return the LAS header.
      */
     public LASHeader getHeader() {
@@ -97,14 +115,36 @@ public final class LASReader {
         }
     }
 
+    /**
+     * Read the LAS header from an input stream of a raw .las file.
+     *
+     * @param is the input stream.
+     * @return the LAS header.
+     */
+    public static LASHeader getHeader(InputStream is) {
+        try (LASreader r = new LASReader(null, new BufferedInputStream(requireNonNull(is))).openReader()) {
+            return new LASHeader(r.header);
+        }
+    }
+
     //--------------------------------< internal >-----------------------------
 
     private LASreader openReader() {
-        if (!file.exists() || !file.isFile()) {
-            throw new UncheckedIOException(
-                    new FileNotFoundException(file.getAbsolutePath()));
+        LASreader reader;
+        if (file != null) {
+            if (!file.exists() || !file.isFile()) {
+                throw new UncheckedIOException(
+                        new FileNotFoundException(file.getAbsolutePath()));
+            }
+            reader = new LASreadOpener().open(file.getAbsolutePath());
+        } else {
+            LASreaderLAS lasReader = new LASreaderLAS();
+            if (lasReader.open(is)) {
+                reader = lasReader;
+            } else {
+                throw new IllegalStateException("Cannot open las reader from stream");
+            }
         }
-        LASreader reader = new LASreadOpener().open(file.getAbsolutePath());
         constraint.apply(reader);
         return reader;
     }
