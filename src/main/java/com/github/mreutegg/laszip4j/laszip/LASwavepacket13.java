@@ -32,8 +32,8 @@ public class LASwavepacket13 {
     public LASwavepacket13() {
         this.return_point = U32I32F32.wrap(slice(12, 4));
         this.x = U32I32F32.wrap(slice(16, 4));
-        this.y = U32I32F32.wrap(slice(16, 4));
-        this.z = U32I32F32.wrap(slice(16, 4));
+        this.y = U32I32F32.wrap(slice(20, 4));
+        this.z = U32I32F32.wrap(slice(24, 4));
     }
 
     public ByteBuffer getData() {
