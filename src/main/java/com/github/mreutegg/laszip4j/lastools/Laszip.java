@@ -286,10 +286,8 @@ public class Laszip {
             {
                 // maybe only a dry read pass
                 start_time = taketime();
-                while (lasreader.read_point()) 
-                {
-                    System.out.println( lasreader.point.toString() );
-                }
+                while (lasreader.read_point());
+                    //System.out.println( lasreader.point.toString() );
 
                 if (check_integrity)
                 {
