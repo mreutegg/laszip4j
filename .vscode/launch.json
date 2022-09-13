@@ -16,7 +16,7 @@
             "request": "launch",
             "mainClass": "com.github.mreutegg.laszip4j.lastools.Laszip",
             "projectName": "laszip4j",
-            "args":"C:\\code\\Seurat\\scala\\Ingestion\\src\\test\\resources\\formats\\red-rocks14_6.laz -dry -iparse xyzicRGB"
+            "args":"YOUR-FILE.laz -dry -iparse xyzicRGB"
         }
     ]
 }
