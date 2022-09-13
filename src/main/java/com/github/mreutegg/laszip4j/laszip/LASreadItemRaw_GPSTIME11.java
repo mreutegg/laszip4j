@@ -15,14 +15,16 @@ import java.nio.ByteOrder;
 
 public class LASreadItemRaw_GPSTIME11 extends LASreadItemRaw {
 
-    private ByteBuffer bb = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN);
+    private ByteBuffer bb = ByteBuffer.allocate(Long.BYTES).order(ByteOrder.LITTLE_ENDIAN);
 
     @Override
-    public void read(byte[] item) {
+    public PointDataRecordGpsTime read(int notUsed) {
+
         bb.clear();
-        instream.getBytes(bb.array(), 8);
-        // write native big endian into item
-        ByteBuffer itemBB = ByteBuffer.wrap(item);
-        itemBB.putLong(bb.getLong());
+        instream.getBytes(bb.array(), Long.BYTES);
+
+        PointDataRecordGpsTime result = new PointDataRecordGpsTime();
+        result.GPSTime = bb.getLong(0);
+        return result;
     }
 }

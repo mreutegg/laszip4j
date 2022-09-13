@@ -224,7 +224,7 @@ public class LASwaveform13writer {
 
     public boolean write_waveform(LASpoint point, byte[] samples)
     {
-        int index = point.wavepacket.getIndex();
+        int index = point.getWavepacketDescriptorIndex();
         if (index == 0)
         {
             return FALSE;
@@ -247,7 +247,7 @@ public class LASwaveform13writer {
         // set offset to waveform data
 
         long offset = stream.tell();
-        point.wavepacket.setOffset(offset);
+        point.setWavepacketOffsetToWaveformData(offset);
 
         // write waveform
 
@@ -259,7 +259,7 @@ public class LASwaveform13writer {
                 fprintf(stderr, "ERROR: cannot write %d bytes for waveform with %d samples of %d bits\n", size, nsamples, nbits);
                 return FALSE;
             }
-            point.wavepacket.setSize(size);
+            point.setWavepacketPacketSize(size);
         }
         else
         {
@@ -287,7 +287,7 @@ public class LASwaveform13writer {
             }
             enc.done();
             int size = (int)(stream.tell() - offset);
-            point.wavepacket.setSize(size);
+            point.setWavepacketPacketSize(size);
         }
 
         return TRUE;

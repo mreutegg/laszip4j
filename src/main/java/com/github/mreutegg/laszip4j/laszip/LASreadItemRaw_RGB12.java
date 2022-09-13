@@ -18,13 +18,15 @@ public class LASreadItemRaw_RGB12 extends LASreadItemRaw {
     private ByteBuffer bb = ByteBuffer.allocate(6).order(ByteOrder.LITTLE_ENDIAN);
 
     @Override
-    public void read(byte[] item) {
+    public PointDataRecordRGB read(int notUsed) {
         bb.clear();
         instream.getBytes(bb.array(), 6);
-        // write native big endian into item
-        ByteBuffer itemBB = ByteBuffer.wrap(item);
-        itemBB.putChar(bb.getChar());   // R
-        itemBB.putChar(bb.getChar());   // G
-        itemBB.putChar(bb.getChar());   // B
+
+        PointDataRecordRGB result = new PointDataRecordRGB();
+
+        result.R = bb.getChar();
+        result.G = bb.getChar();
+        result.B = bb.getChar();
+        return result;
     }
 }

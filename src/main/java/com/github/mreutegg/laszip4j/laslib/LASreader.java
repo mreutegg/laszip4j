@@ -420,8 +420,6 @@ public abstract class LASreader implements Closeable {
         }
     }
 
-    public void compute_coordinates() { point.compute_coordinates(); };
-
     public double get_min_x() { return header.min_x; };
     public double get_min_y() { return header.min_y; };
     public double get_min_z() { return header.min_z; };

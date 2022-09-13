@@ -21,6 +21,8 @@ import com.github.mreutegg.laszip4j.laslib.LASreader;
 import com.github.mreutegg.laszip4j.laslib.LASreaderLAS;
 import com.github.mreutegg.laszip4j.laszip.LASpoint;
 
+import static com.github.mreutegg.laszip4j.laszip.LASzip.LASZIP_DECOMPRESS_SELECTIVE_ALL;
+
 import java.io.*;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -139,7 +141,7 @@ public final class LASReader {
             reader = new LASreadOpener().open(file.getAbsolutePath());
         } else {
             LASreaderLAS lasReader = new LASreaderLAS();
-            if (lasReader.open(is)) {
+            if (lasReader.open(is, LASZIP_DECOMPRESS_SELECTIVE_ALL)) {
                 reader = lasReader;
             } else {
                 throw new IllegalStateException("Cannot open las reader from stream");

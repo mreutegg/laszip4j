@@ -64,7 +64,9 @@ public class LASattributer extends LASquantizer {
         {
             number_attributes++;
             attributes.add(attribute);
-            attribute_starts.add(attribute_starts.get(number_attributes-2) + attribute_sizes.get(number_attributes-2));
+            int priorStart = attribute_starts.size() > 1 ? attribute_starts.get(attribute_starts.size()-2) : 0;
+            int priorSize = attribute_sizes.size() > 1 ? attribute_sizes.get(attribute_sizes.size()-2) : 0;
+            attribute_starts.add(priorStart + priorSize);
             attribute_sizes.add(attributes.get(number_attributes-1).get_size());
             return number_attributes-1;
         }
@@ -81,7 +83,7 @@ public class LASattributer extends LASquantizer {
         int i;
         for (i = 0; i < number_attributes; i++)
         {
-            if (strcmp(attributes.get(i).   name, name) == 0)
+            if (strcmp(attributes.get(i).name, name) == 0)
             {
                 return i;
             }

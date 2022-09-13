@@ -19,15 +19,36 @@ public class ByteStreamInArray extends ByteStreamIn {
 
     private ByteBuffer data;
 
+    public ByteStreamInArray()
+    {
+        data = null;
+    }
+    
     public ByteStreamInArray(byte[] bytes, long size) {
         super();
+
+        init(bytes,size);
+    }
+
+    public boolean init(byte[] bytes, long size)
+    {
         if (size > Integer.MAX_VALUE) {
             throw new IllegalArgumentException();
         }
-        this.data = ByteBuffer.wrap(bytes, 0, (int) size);
-        this.data.order(LITTLE_ENDIAN);
-    }
 
+        if ( null != bytes )
+        {
+            this.data = ByteBuffer.wrap(bytes, 0, (int) size);
+            this.data.order(LITTLE_ENDIAN);
+        }
+        else
+        {
+            this.data = null;
+        }
+
+        return true;
+    }
+    
     @Override
     public byte getByte() {
         if (!data.hasRemaining()) {

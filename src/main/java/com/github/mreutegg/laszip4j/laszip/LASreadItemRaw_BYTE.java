@@ -12,14 +12,17 @@ package com.github.mreutegg.laszip4j.laszip;
 
 public class LASreadItemRaw_BYTE extends LASreadItemRaw {
 
-    private final int number;
+    private final int byteCount;
 
-    public LASreadItemRaw_BYTE(int number) {
-        this.number = number;
+    public LASreadItemRaw_BYTE(int byteCount) {
+        this.byteCount = byteCount;
     }
 
     @Override
-    public void read(byte[] item) {
-        instream.getBytes(item, number);
+    public PointDataRecordBytes read(int notUsed) {
+
+        PointDataRecordBytes result = new PointDataRecordBytes(byteCount);
+        instream.getBytes(result.Bytes, byteCount);
+        return result;
     }
 }

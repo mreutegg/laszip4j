@@ -64,14 +64,8 @@ public class LASinventory {
     boolean add(LASpoint point)
     {
         extended_number_of_point_records++;
-        if (point.getExtended_point_type() != 0)
-        {
-            extended_number_of_points_by_return[point.getExtended_return_number()]++;
-        }
-        else
-        {
-            extended_number_of_points_by_return[point.getReturn_number()]++;
-        }
+        extended_number_of_points_by_return[point.getReturn_number()]++;
+        
         if (first)
         {
             min_X = max_X = point.get_X();

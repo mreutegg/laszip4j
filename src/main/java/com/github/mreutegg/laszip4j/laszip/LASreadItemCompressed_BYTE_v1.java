@@ -10,14 +10,10 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
-import static com.github.mreutegg.laszip4j.clib.Cstring.memcpy;
-import static java.lang.Boolean.TRUE;
-
 public class LASreadItemCompressed_BYTE_v1 extends LASreadItemCompressed {
 
-    private ArithmeticDecoder dec;
     private int number; // unsigned
-    private byte[] last_item;
+    private PointDataRecordBytes last_item;
 
     private IntegerCompressor ic_byte;
 
@@ -25,18 +21,15 @@ public class LASreadItemCompressed_BYTE_v1 extends LASreadItemCompressed {
     {
         /* set decoder */
         assert(dec != null);
-        this.dec = dec;
         assert(number != 0);
         this.number = number;
 
         /* create models and integer compressors */
         ic_byte = new IntegerCompressor(dec, 8, number);
-
-        /* create last item */
-        last_item = new byte[number];
     }
 
-    public boolean init(byte[] item)
+    @Override	
+    public void init(PointDataRecord seedItem, int notUsed)
     {
         /* init state */
 
@@ -44,17 +37,24 @@ public class LASreadItemCompressed_BYTE_v1 extends LASreadItemCompressed {
         ic_byte.initDecompressor();
 
         /* init last item */
-        memcpy(last_item, item, number);
-        return TRUE;
+        last_item = (PointDataRecordBytes)seedItem;
     }
 
-    public void read(byte[] item)
+    @Override	
+    public PointDataRecord read(int notUsed)
     {
-        int i;
-        for (i = 0; i < number; i++)
+        PointDataRecordBytes result = new PointDataRecordBytes(number);
+
+        for (int i = 0; i < number; i++)
         {
-            item[i] = (byte)(ic_byte.decompress(last_item[i], i));
+            result.Bytes[i] = (byte)(ic_byte.decompress(last_item.Bytes[i], i));
         }
-        memcpy(last_item, item, number);
+
+        return result;
+    }
+
+    @Override	
+    public boolean chunk_sizes() {	
+        return false;	
     }
 }

@@ -18,17 +18,18 @@ public class LASreadItemRaw_WAVEPACKET13 extends LASreadItemRaw {
     private ByteBuffer bb = ByteBuffer.allocate(29).order(ByteOrder.LITTLE_ENDIAN);
 
     @Override
-    public void read(byte[] item) {
+    public PointDataRecordWavepacket read(int notUsed) {
         bb.clear();
         instream.getBytes(bb.array(), 29);
-        // write native big endian into item
-        ByteBuffer itemBB = ByteBuffer.wrap(item);
-        itemBB.put(bb.get());           // wavepacket descriptor index
-        itemBB.putLong(bb.getLong());   // byte offset to waveform data
-        itemBB.putInt(bb.getInt());     // waveform packet size in bytes
-        itemBB.putInt(bb.getInt());     // return point waveform location
-        itemBB.putInt(bb.getInt());     // X(t)
-        itemBB.putInt(bb.getInt());     // Y(t)
-        itemBB.putInt(bb.getInt());     // Z(t)
+
+        PointDataRecordWavepacket result = new PointDataRecordWavepacket();
+        result.DescriptorIndex = bb.get();
+        result.OffsetToWaveformData = bb.getLong();
+        result.PacketSize = bb.getInt();
+        result.ReturnPointWaveformLocation = bb.getFloat();
+        result.ParametricDx = bb.getFloat();
+        result.ParametricDy = bb.getFloat();
+        result.ParametricDz = bb.getFloat();
+        return result;
     }
 }

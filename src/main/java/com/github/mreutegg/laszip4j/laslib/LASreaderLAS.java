@@ -49,11 +49,7 @@ public class LASreaderLAS extends LASreader {
     private LASreadPoint reader;
     private boolean checked_end;
 
-    public boolean open(String file_name, int io_ibuffer_size) {
-        return open(file_name, io_ibuffer_size, false);
-    }
-
-    boolean open(String file_name, int io_buffer_size, boolean peek_only)
+    boolean open(String file_name, int io_buffer_size, boolean peek_only, int decompress_selective)
     {
         if (file_name == null)
         {
@@ -71,10 +67,10 @@ public class LASreaderLAS extends LASreader {
         // create input
         ByteStreamIn in = new ByteStreamInFile(file);
 
-        return open(in, peek_only);
+        return open(in, peek_only, decompress_selective);
     }
 
-    boolean open(RandomAccessFile file, boolean peek_only)
+    boolean open(RandomAccessFile file, boolean peek_only, int decompress_selective)
     {
         if (file == null)
         {
@@ -85,33 +81,33 @@ public class LASreaderLAS extends LASreader {
         // create input
         ByteStreamIn in = new ByteStreamInFile(file);
 
-        return open(in);
+        return open(in, decompress_selective);
     }
 
 
-    public boolean open(InputStream in) {
-        return open(in, false);
+    public boolean open(InputStream in, int decompress_selective) {
+        return open(in, false, decompress_selective);
     }
 
-    boolean open(InputStream stream, boolean peek_only)
+    boolean open(InputStream stream, boolean peek_only, int decompress_selective)
     {
         // create input
         ByteStreamIn in = new ByteStreamInStream(stream);
 
-        return open(in, peek_only);
+        return open(in, peek_only, decompress_selective);
     }
 
-    boolean open(ByteStreamIn stream) {
-        return open(stream, false);
+    boolean open(ByteStreamIn stream, int decompress_selective) {
+        return open(stream, false, decompress_selective);
     }
 
-    boolean open(ByteStreamIn stream, boolean peek_only)
+    boolean open(ByteStreamIn stream, boolean peek_only, int decompress_selective)
     {
         int i,j;
 
         if (stream == null)
         {
-            fprintf(stderr,"ERROR: ByteStreamIn* pointer is zero\n");
+            fprintf(stderr,"ERROR: ByteStreamIn is null\n");
             return FALSE;
         }
 
@@ -1200,7 +1196,7 @@ public class LASreaderLAS extends LASreader {
 
         // create the point reader
 
-        reader = new LASreadPoint();
+        reader = new LASreadPoint(decompress_selective);
 
         // initialize point and the reader
 
@@ -1294,7 +1290,7 @@ public class LASreaderLAS extends LASreader {
     {
         if (p_count < npoints)
         {
-            if (reader.read(point.point) == FALSE)
+            if (reader.read(point.PointRecords) == FALSE)
             {
                 if (reader.error() != null)
                 {

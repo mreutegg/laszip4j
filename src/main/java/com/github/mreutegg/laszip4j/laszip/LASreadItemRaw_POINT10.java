@@ -18,19 +18,20 @@ public class LASreadItemRaw_POINT10 extends LASreadItemRaw {
     private ByteBuffer bb = ByteBuffer.allocate(20).order(ByteOrder.LITTLE_ENDIAN);
 
     @Override
-    public void read(byte[] item) {
+    public PointDataRecordPoint10 read(int notUsed) {
         bb.clear();
         instream.getBytes(bb.array(), 20);
-        // write native big endian into item
-        ByteBuffer itemBB = ByteBuffer.wrap(item);
-        itemBB.putInt(bb.getInt());     // x
-        itemBB.putInt(bb.getInt());     // y
-        itemBB.putInt(bb.getInt());     // z
-        itemBB.putChar(bb.getChar());   // intensity
-        itemBB.put(bb.get());           // return_number, number_of_returns, scan_direction, edge_of_flight
-        itemBB.put(bb.get());           // classification, synthetic, keypoint, withheld
-        itemBB.put(bb.get());           // scan_angle
-        itemBB.put(bb.get());           // userdata
-        itemBB.putChar(bb.getChar());   // point_source_ID
+
+        PointDataRecordPoint10 result = new PointDataRecordPoint10();
+        result.X = bb.getInt();
+        result.Y = bb.getInt();
+        result.Z = bb.getInt();
+        result.Intensity = bb.getChar();
+        result.Flags = bb.get();
+        result.Classification = bb.get();
+        result.ScanAngleRank = bb.get();
+        result.UserData = (short)Byte.toUnsignedInt(bb.get());
+        result.PointSourceID = bb.getChar();
+        return result;
     }
 }

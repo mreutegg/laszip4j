@@ -64,7 +64,7 @@ public class ArithmeticEncoder {
     private int endbuffer;
     private int outbyte;
     private int endbyte;
-    private int u_base, u_value, u_length;
+    private int u_base, u_length;
 
     public ArithmeticEncoder() {
         outbuffer = new byte[AC_BUFFER_SIZE];

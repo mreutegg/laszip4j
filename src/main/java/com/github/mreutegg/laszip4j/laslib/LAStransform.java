@@ -12,12 +12,16 @@ package com.github.mreutegg.laszip4j.laslib;
 
 import com.github.mreutegg.laszip4j.laszip.LASpoint;
 
+import static com.github.mreutegg.laszip4j.laszip.LASzip.LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY;
+
 // TODO: dummy implementation only
 public class LAStransform {
 
     public void transform(LASpoint point) {
 
     }
+
+    public int get_decompress_selective() { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; }
 
     public void reset() {
 

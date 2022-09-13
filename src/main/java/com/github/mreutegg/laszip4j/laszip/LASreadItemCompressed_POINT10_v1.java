@@ -10,15 +10,10 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
-import java.nio.ByteBuffer;
-
-import static com.github.mreutegg.laszip4j.clib.Cstring.memcpy;
-import static java.lang.Boolean.TRUE;
-
 public class LASreadItemCompressed_POINT10_v1 extends LASreadItemCompressed {
 
     private ArithmeticDecoder dec;
-    private byte[] last_item = new byte[20];
+    private PointDataRecordPoint10 last_item = null;
 
     private int[] last_x_diff = new int[3];
     private int[] last_y_diff = new int[3];
@@ -58,7 +53,8 @@ public class LASreadItemCompressed_POINT10_v1 extends LASreadItemCompressed {
     }
 
     @Override
-    public boolean init(byte[] item) {
+    public void init(PointDataRecord seedItem, int notUsed) {
+
         int i;
 
         /* init state */
@@ -81,14 +77,12 @@ public class LASreadItemCompressed_POINT10_v1 extends LASreadItemCompressed {
             if (m_user_data[i] != null) dec.initSymbolModel(m_user_data[i]);
         }
 
-        /* init last item */
-        memcpy(last_item, item, 20);
-
-        return TRUE;
+        last_item = (PointDataRecordPoint10)seedItem;
     }
 
     @Override
-    public void read(byte[] item) {
+    public PointDataRecord read(int notUsed) {
+
         // find median difference for x and y from 3 preceding differences
         int median_x;
         if (last_x_diff[0] < last_x_diff[1])
@@ -132,14 +126,13 @@ public class LASreadItemCompressed_POINT10_v1 extends LASreadItemCompressed {
 
         // decompress x y z coordinates
         int x_diff = ic_dx.decompress(median_x);
-        LASpoint10 lp = LASpoint10.wrap(last_item);
-        lp.setX(lp.getX() + x_diff);
+        last_item.X += x_diff;
         // we use the number k of bits corrector bits to switch contexts
         int k_bits = ic_dx.getK(); // unsigned
         int y_diff = ic_dy.decompress(median_y, (k_bits < 19 ? k_bits : 19));
-        lp.setY(lp.getY() + y_diff);
+        last_item.Y += y_diff;
         k_bits = (k_bits + ic_dy.getK())/2;
-        lp.setZ(ic_z.decompress(lp.getZ(), (k_bits < 19 ? k_bits : 19)));
+        last_item.Z = ic_z.decompress((int)last_item.Z, (k_bits < 19 ? k_bits : 19));
 
         // decompress which other values have changed
         int changed_values = dec.decodeSymbol(m_changed_values);
@@ -149,52 +142,52 @@ public class LASreadItemCompressed_POINT10_v1 extends LASreadItemCompressed {
             // decompress the intensity if it has changed
             if ((changed_values & 32) != 0)
             {
-                lp.setIntensity((char) ic_intensity.decompress(lp.getIntensity()));
+                last_item.Intensity = (char) ic_intensity.decompress(last_item.Intensity);
             }
 
-            // decompress the edge_of_flight_line, scan_direction_flag, ... if it has changed
+            // decompress the flags, ... if has changed
             if ((changed_values & 16) != 0)
             {
-                if (m_bit_byte[last_item[14]] == null)
+                if (m_bit_byte[last_item.Flags] == null)
                 {
-                    m_bit_byte[last_item[14]] = dec.createSymbolModel(256);
-                    dec.initSymbolModel(m_bit_byte[last_item[14]]);
+                    m_bit_byte[last_item.Flags] = dec.createSymbolModel(256);
+                    dec.initSymbolModel(m_bit_byte[last_item.Flags]);
                 }
-                last_item[14] = (byte) dec.decodeSymbol(m_bit_byte[last_item[14]]);
+                last_item.Flags = (byte) dec.decodeSymbol(m_bit_byte[last_item.Flags]);
             }
 
             // decompress the classification ... if it has changed
             if ((changed_values & 8) != 0)
             {
-                if (m_classification[last_item[15]] == null)
+                if (m_classification[last_item.Classification] == null)
                 {
-                    m_classification[last_item[15]] = dec.createSymbolModel(256);
-                    dec.initSymbolModel(m_classification[last_item[15]]);
+                    m_classification[last_item.Classification] = dec.createSymbolModel(256);
+                    dec.initSymbolModel(m_classification[last_item.Classification]);
                 }
-                last_item[15] = (byte) dec.decodeSymbol(m_classification[last_item[15]]);
+                last_item.Classification = (byte) dec.decodeSymbol(m_classification[last_item.Classification]);
             }
 
             // decompress the scan_angle_rank ... if it has changed
             if ((changed_values & 4) != 0)
             {
-                last_item[16] = (byte) ic_scan_angle_rank.decompress(last_item[16], k_bits < 3 ? 1 : 0);
+                last_item.ScanAngleRank = (byte) ic_scan_angle_rank.decompress(last_item.ScanAngleRank, k_bits < 3 ? 1 : 0);
             }
 
             // decompress the user_data ... if it has changed
             if ((changed_values & 2) != 0)
             {
-                if (m_user_data[last_item[17]] == null)
+                if (m_user_data[last_item.UserData] == null)
                 {
-                    m_user_data[last_item[17]] = dec.createSymbolModel(256);
-                    dec.initSymbolModel(m_user_data[last_item[17]]);
+                    m_user_data[last_item.UserData] = dec.createSymbolModel(256);
+                    dec.initSymbolModel(m_user_data[last_item.UserData]);
                 }
-                last_item[17] = (byte) dec.decodeSymbol(m_user_data[last_item[17]]);
+                last_item.UserData = (short) dec.decodeSymbol(m_user_data[last_item.UserData]);
             }
 
             // decompress the point_source_ID ... if it has changed
             if ((changed_values & 1) != 0)
             {
-                lp.setPoint_source_ID((char) ic_point_source_ID.decompress(lp.getPoint_source_ID()));
+                last_item.PointSourceID = (char)ic_point_source_ID.decompress(last_item.PointSourceID);
             }
         }
 
@@ -205,78 +198,13 @@ public class LASreadItemCompressed_POINT10_v1 extends LASreadItemCompressed {
         if (last_incr > 2) last_incr = 0;
 
         // copy the last point
-        memcpy(item, last_item, 20);
+        PointDataRecordPoint10 result = new PointDataRecordPoint10(last_item);
+
+        return result;
     }
 
-    static class LASpoint10
-    {
-        private final ByteBuffer bb;
-
-        private LASpoint10(ByteBuffer bb) {
-            this.bb = bb;
-        }
-
-        public LASpoint10() {
-            this(ByteBuffer.allocate(20));
-        }
-
-        static LASpoint10 wrap(byte[] data) {
-            return new LASpoint10(ByteBuffer.wrap(data));
-        }
-
-        int getX() {
-            return bb.getInt(0);
-        }
-
-        void setX(int x) {
-            bb.putInt(0, x);
-        }
-
-        int getY() {
-            return bb.getInt(4);
-        }
-
-        void setY(int y) {
-            bb.putInt(4, y);
-        }
-
-        int getZ() {
-            return bb.getInt(8);
-        }
-
-        void setZ(int z) {
-            bb.putInt(8, z);
-        }
-
-        char getIntensity() {
-            return bb.getChar(12);
-        }
-
-        void setIntensity(char i) {
-            bb.putChar(12, i);
-        }
-
-        char getPoint_source_ID() {
-            return bb.getChar(18);
-        }
-
-        void setPoint_source_ID(char id) {
-            bb.putChar(18, id);
-        }
-
-        /*
-        int x;                                              // 0
-        int y;                                              // 4
-        int z;                                              // 8
-        char intensity;                                     // 12
-        byte return_number = 3;                             // 14
-        byte number_of_returns_of_given_pulse = 3;          // 14
-        byte scan_direction_flag = 1;                       // 14
-        byte edge_of_flight_line = 1;                       // 14
-        byte classification;                                // 15
-        byte scan_angle_rank;                               // 16
-        byte user_data;                                     // 17
-        char point_source_ID;                               // 18
-        */
-    };
+    @Override	
+    public boolean chunk_sizes() {	
+        return false;	
+    }
 }

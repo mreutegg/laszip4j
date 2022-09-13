@@ -38,6 +38,10 @@ import static com.github.mreutegg.laszip4j.laslib.LasDefinitions.LAS_TOOLS_FORMA
 import static com.github.mreutegg.laszip4j.laslib.LasDefinitions.LAS_TOOLS_FORMAT_SHP;
 import static com.github.mreutegg.laszip4j.laslib.LasDefinitions.LAS_TOOLS_FORMAT_TXT;
 import static com.github.mreutegg.laszip4j.laslib.LasDefinitions.LAS_TOOLS_IO_IBUFFER_SIZE;
+
+import static com.github.mreutegg.laszip4j.laszip.LASzip.LASZIP_DECOMPRESS_SELECTIVE_ALL;
+
+
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
@@ -86,6 +90,9 @@ public class LASreadOpener {
     private LASindex index;
     private LASfilter filter;
     private LAStransform transform;
+
+	// optional selective decompression (compressed new LAS 1.4 point types only)
+	private int decompress_selective;
 
     // optional area-of-interest query (spatially indexed) 
     private float[] inside_tile;
@@ -346,7 +353,7 @@ public class LASreadOpener {
                         lasreaderlas = new LASreaderLASreoffset(offset[0], offset[1], offset[2]);
                     else
                         lasreaderlas = new LASreaderLASrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
-                    if (!lasreaderlas.open(file_name, io_ibuffer_size))
+                    if (!lasreaderlas.open(file_name, io_ibuffer_size, false, decompress_selective))
                     {
                         fprintf(stderr,"ERROR: cannot open lasreaderlas with file name '%s'\n", file_name);
                         return null;
@@ -714,7 +721,7 @@ public class LASreadOpener {
                     lasreaderlas = new LASreaderLASreoffset(offset[0], offset[1], offset[2]);
                 else
                     lasreaderlas = new LASreaderLASrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
-                if (!lasreaderlas.open(System.in))
+                if (!lasreaderlas.open(System.in, decompress_selective))
                 {
                     fprintf(stderr,"ERROR: cannot open lasreaderlas from stdin \n");
                     return null;
@@ -812,7 +819,7 @@ public class LASreadOpener {
                 if (strstr(file_name, ".las") || strstr(file_name, ".laz") || strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))
                 {
                     LASreaderLAS lasreaderlas = (LASreaderLAS)lasreader;
-                    if (!lasreaderlas.open(file_name, io_ibuffer_size))
+                    if (!lasreaderlas.open(file_name, io_ibuffer_size, false, decompress_selective))
                     {
                         fprintf(stderr,"ERROR: cannot reopen lasreaderlas with file name '%s'\n", file_name);
                         return FALSE;
@@ -1743,6 +1750,23 @@ public class LASreadOpener {
         this.pipe_on = pipe_on;
     }
 
+    void set_decompress_selective(int decompress_selective)
+    {
+        this.decompress_selective = decompress_selective;
+        if (filter != null)
+        {
+            this.decompress_selective |= filter.get_decompress_selective();
+        }
+        if (transform != null)
+        {
+            this.decompress_selective |= transform.get_decompress_selective();
+        }
+        //if (ignore != null)
+        //{
+            //this.decompress_selective |= ignore.get_decompress_selective();
+        //}
+    }
+
     void set_inside_tile(float ll_x, float ll_y, float size)
     {
         if (inside_tile == null) inside_tile = new float[3];
@@ -1811,6 +1835,7 @@ public class LASreadOpener {
         pipe_on = FALSE;
         unique = FALSE;
         file_name_current = 0;
+        decompress_selective = LASZIP_DECOMPRESS_SELECTIVE_ALL;
         inside_tile = null;
         inside_circle = null;
         inside_rectangle = null;

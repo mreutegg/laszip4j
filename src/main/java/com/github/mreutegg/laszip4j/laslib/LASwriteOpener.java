@@ -27,6 +27,7 @@ import static com.github.mreutegg.laszip4j.laslib.LasDefinitions.LAS_TOOLS_FORMA
 import static com.github.mreutegg.laszip4j.laslib.LasDefinitions.LAS_TOOLS_IO_OBUFFER_SIZE;
 import static com.github.mreutegg.laszip4j.laszip.LASzip.LASZIP_CHUNK_SIZE_DEFAULT;
 import static com.github.mreutegg.laszip4j.laszip.LASzip.LASZIP_COMPRESSOR_CHUNKED;
+import static com.github.mreutegg.laszip4j.laszip.LASzip.LASZIP_COMPRESSOR_LAYERED_CHUNKED;
 import static com.github.mreutegg.laszip4j.laszip.LASzip.LASZIP_COMPRESSOR_NONE;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -49,6 +50,7 @@ public class LASwriteOpener {
     private int format;             // unsigned
     private boolean specified;
     private boolean force;
+    private boolean ntive;          // 'native'
     private int chunk_size;         // unsigned
     private boolean use_stdout;
     private boolean use_nil;
@@ -76,7 +78,7 @@ public class LASwriteOpener {
             if (format <= LAS_TOOLS_FORMAT_LAZ)
             {
                 LASwriterLAS laswriterlas = new LASwriterLAS();
-                if (!laswriterlas.open(file_name, header, (format == LAS_TOOLS_FORMAT_LAZ ? LASZIP_COMPRESSOR_CHUNKED : LASZIP_COMPRESSOR_NONE), 2, chunk_size, io_obuffer_size))
+                if (!laswriterlas.open(file_name, header, (format == LAS_TOOLS_FORMAT_LAZ ? (ntive ? LASZIP_COMPRESSOR_LAYERED_CHUNKED : LASZIP_COMPRESSOR_CHUNKED) : LASZIP_COMPRESSOR_NONE), 2, chunk_size, io_obuffer_size))
                 {
                     fprintf(stderr,"ERROR: cannot open laswriterlas with file name '%s'\n", file_name);
                     return null;
@@ -289,6 +291,16 @@ public class LASwriteOpener {
                 set_force(TRUE);
                 argv[i]="\0";
             }
+            else if (strcmp(argv[i],"-native") == 0)
+            {
+                set_native(TRUE);
+                argv[i]="\0";
+            }
+            else if (strcmp(argv[i],"-compatible") == 0)
+            {
+                set_native(FALSE);
+                argv[i]="\0";
+            }
             else if (strcmp(argv[i],"-olas") == 0)
             {
                 specified = TRUE;
@@ -491,6 +503,11 @@ public class LASwriteOpener {
     {
         this.cut = cut;
         if (cut != 0 && file_name != null) cut_characters();
+    }
+
+    void set_native(boolean ntive)
+    {
+      this.ntive = ntive;
     }
 
     public boolean set_format(int format)
@@ -835,6 +852,11 @@ public class LASwriteOpener {
         return cut;
     }
 
+    public boolean get_native()
+    {
+      return ntive;
+    }
+
     public boolean format_was_specified()
     {
         return specified;
@@ -980,6 +1002,7 @@ public class LASwriteOpener {
         parse_string = null;
         separator = null;
         scale_rgb = 1.0f;
+        ntive = true;
         format = LAS_TOOLS_FORMAT_DEFAULT;
         specified = FALSE;
         force = FALSE;

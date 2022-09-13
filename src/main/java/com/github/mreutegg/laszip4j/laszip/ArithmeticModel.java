@@ -49,7 +49,7 @@ package com.github.mreutegg.laszip4j.laszip;
 
 public class ArithmeticModel {
 
-    static final int AC_BUFFER_SIZE = 1024;
+    static final int AC_BUFFER_SIZE = 4096;
 
     static final int AC__MinLength = 0x01000000;   // threshold for renormalization
     static final int AC__MaxLength = 0xFFFFFFFF;      // maximum AC interval length
@@ -84,15 +84,14 @@ public class ArithmeticModel {
                 while (u_symbols > (1 << (table_bits + 2))) ++table_bits;
                 u_table_size = 1 << table_bits;
                 u_table_shift = DM__LengthShift - table_bits;
-                u_distribution = new int[u_symbols];
-                u_decoder_table = new int[u_table_size +2];
+                u_decoder_table = new int[u_table_size+2];
             }
             else // small alphabet: no table needed
             {
                 u_decoder_table = null;
                 u_table_size = u_table_shift = 0;
-                u_distribution = new int[u_symbols];
             }
+            u_distribution = new int[2*u_symbols];
             u_symbol_count = new int[u_symbols];
         }
 
