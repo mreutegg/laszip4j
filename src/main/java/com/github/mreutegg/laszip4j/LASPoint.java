@@ -58,14 +58,14 @@ public final class LASPoint {
     }
 
     /**
-     * @return "Return Number" as a byte (3 bits).
+     * @return "Return Number" as a byte (range 1..15).
      */
     public byte getReturnNumber() {
         return p.getReturn_number();
     }
 
     /**
-     * @return "Number of Returns (given pulse)" as a byte (3 bits)
+     * @return "Number of Returns (given pulse)" as a byte (range 1..15)
      */
     public byte getNumberOfReturns() {
         return p.getNumber_of_returns();
@@ -86,9 +86,9 @@ public final class LASPoint {
     }
 
     /**
-     * @return "Classification" as an unsigned byte.
+     * @return "Classification" as a short (range is 0..31 for point10, and 0..255 for point14).
      */
-    public byte getClassification() {
+    public short getClassification() {
         return p.getClassification();
     }
 
@@ -123,12 +123,12 @@ public final class LASPoint {
     /**
      * @return "User Data" as a unsigned byte.
      */
-    public byte getUserData() {
+    public short getUserData() {
         return p.getUser_data();
     }
 
     /**
-     * @return "Point Source ID" as an unsigned short (char).
+     * @return "Point Source ID" as an unsigned short (range 0..65535).
      */
     public char getPointSourceID() {
         return p.getPoint_source_ID();
@@ -173,64 +173,41 @@ public final class LASPoint {
      * @return {@code true} if this point has a wave packet.
      */
     public boolean hasWavePacket() {
-        return p.have_wavepacket;
+        return p.haveWavepacket();
     }
 
     /**
-     * @return "Wave Packet Descriptor Index" as an unsigned byte.
+     * @return "Wave Packet Descriptor Index"
      */
-    public byte getWavePacketDescriptorIndex() {
-        ensureWavePacket();
-        return p.wavepacket.getIndex();
-    }
+    public byte getWavePacketDescriptorIndex() { return (byte)p.getWavepacketDescriptorIndex(); }
 
     /**
      * @return "Byte offset to waveform data" as an unsigned long.
      */
-    public long getByteOffsetToWaveformData() {
-        ensureWavePacket();
-        return p.wavepacket.getOffset();
-    }
+    public long getByteOffsetToWaveformData() { return p.getWavepacketOffsetToWaveformData(); }
 
     /**
      * @return "Waveform packet size in bytes" as an unsigned int.
      */
-    public int getWaveformPacketSizeInBytes() {
-        ensureWavePacket();
-        return p.wavepacket.getSize();
-    }
+    public int getWaveformPacketSizeInBytes() { return (int)p.getWavepacketPacketSize(); }
 
     /**
      * @return "Return Point Waveform Location" as a float.
      */
-    public float getReturnPointWaveformLocation() {
-        return p.wavepacket.getLocation();
-    }
+    public float getReturnPointWaveformLocation() { return p.getWavepacketReturnPointWaveformLocation();}
 
     /**
      * @return "X(t)" as a float.
      */
-    public float getXt() {
-        return p.wavepacket.getXt();
-    }
+    public float getXt() { return p.getWavepacketParametricDx(); }
 
     /**
      * @return "Y(t)" as a float.
      */
-    public float getYt() {
-        return p.wavepacket.getYt();
-    }
+    public float getYt() { return p.getWavepacketParametricDy(); }
 
     /**
      * @return "Z(t)" as a float.
      */
-    public float getZt() {
-        return p.wavepacket.getZt();
-    }
-
-    private void ensureWavePacket() {
-        if (!hasWavePacket()) {
-            throw new UnsupportedOperationException();
-        }
-    }
+    public float getZt() { return p.getWavepacketParametricDz(); }
 }

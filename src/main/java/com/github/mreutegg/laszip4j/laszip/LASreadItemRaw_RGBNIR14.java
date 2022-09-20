@@ -18,14 +18,15 @@ public class LASreadItemRaw_RGBNIR14 extends LASreadItemRaw {
     private ByteBuffer bb = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN);
 
     @Override
-    public void read(byte[] item) {
+    public PointDataRecordRgbNIR read(int notUsed) {
         bb.clear();
         instream.getBytes(bb.array(), 8);
-        // write native big endian into item
-        ByteBuffer itemBB = ByteBuffer.wrap(item);
-        itemBB.putChar(bb.getChar()); // R
-        itemBB.putChar(bb.getChar()); // G
-        itemBB.putChar(bb.getChar()); // B
-        itemBB.putChar(bb.getChar()); // NIR
+
+        PointDataRecordRgbNIR result = new PointDataRecordRgbNIR();
+        result.R = bb.getChar();
+        result.G = bb.getChar();
+        result.B = bb.getChar();
+        result.NIR = bb.getChar();
+        return result;
     }
 }

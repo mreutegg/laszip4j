@@ -10,14 +10,10 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
-import java.nio.ByteBuffer;
-
-import static java.lang.Boolean.TRUE;
-
 public class LASreadItemCompressed_WAVEPACKET13_v1 extends LASreadItemCompressed {
 
     private ArithmeticDecoder dec;
-    private byte[] last_item;
+    private PointDataRecordWavepacket last_item;
 
     private int last_diff_32;
     private int sym_last_offset_diff; // unsigned
@@ -46,10 +42,10 @@ public class LASreadItemCompressed_WAVEPACKET13_v1 extends LASreadItemCompressed
         ic_xyz = new IntegerCompressor(dec, 32, 3);
 
         /* create last item */
-        last_item = new byte[28];
+        last_item = null;
     }
 
-    public boolean init(byte[] item)
+    public void init(PointDataRecord seedItem, int notUsed)
     {
         /* init state */
         last_diff_32 = 0;
@@ -67,47 +63,48 @@ public class LASreadItemCompressed_WAVEPACKET13_v1 extends LASreadItemCompressed
         ic_xyz.initDecompressor();
 
         /* init last item */
-        System.arraycopy(item, 1, last_item, 0, 28);
-        return TRUE;
+        last_item = (PointDataRecordWavepacket)seedItem;
     }
 
-    public void read(byte[] itemArray)
+    public PointDataRecord read(int notUsed)
     {
-        ByteBuffer item = ByteBuffer.wrap(itemArray);
-        item.put((byte)(dec.decodeSymbol(m_packet_index)));
-
-        LASwavepacket13 this_item_m = new LASwavepacket13();
-        LASwavepacket13 last_item_m = LASwavepacket13.unpack(last_item);
-
+        PointDataRecordWavepacket result = new PointDataRecordWavepacket();
+        result.DescriptorIndex = (short)dec.decodeSymbol(m_packet_index);
+            
         sym_last_offset_diff = dec.decodeSymbol(m_offset_diff[sym_last_offset_diff]);
-
+      
         if (sym_last_offset_diff == 0)
         {
-            this_item_m.setOffset(last_item_m.getOffset());
+            result.OffsetToWaveformData = last_item.OffsetToWaveformData;
         }
         else if (sym_last_offset_diff == 1)
         {
-            this_item_m.setOffset(last_item_m.getOffset() + last_item_m.getPacket_size());
+            result.OffsetToWaveformData = last_item.OffsetToWaveformData + last_item.PacketSize;
         }
         else if (sym_last_offset_diff == 2)
         {
             last_diff_32 = ic_offset_diff.decompress(last_diff_32);
-            this_item_m.setOffset(last_item_m.getOffset() + last_diff_32);
+            result.OffsetToWaveformData = last_item.OffsetToWaveformData + last_diff_32;
         }
         else
         {
-            this_item_m.setOffset(dec.readInt64());
+            result.OffsetToWaveformData = dec.readInt64();
         }
+      
+        result.PacketSize = ic_packet_size.decompress((int)last_item.PacketSize);
+        result.setReturnPointWaveformLocation( ic_return_point.decompress(last_item.getReturnPointWaveformLocationAsInt()) );
+        result.setDx( ic_xyz.decompress(last_item.getDxAsInt(), 0) );
+        result.setDy( ic_xyz.decompress(last_item.getDyAsInt(), 1) );
+        result.setDz( ic_xyz.decompress(last_item.getDzAsInt(), 2));
+      
+        last_item = new PointDataRecordWavepacket(result);
 
-        this_item_m.setPacket_size(ic_packet_size.decompress(last_item_m.getPacket_size()));
-        this_item_m.getReturn_point().setI32(ic_return_point.decompress(last_item_m.getReturn_point().getI32()));
-        this_item_m.getX().setI32(ic_xyz.decompress(last_item_m.getX().getI32(), 0));
-        this_item_m.getY().setI32(ic_xyz.decompress(last_item_m.getY().getI32(), 1));
-        this_item_m.getZ().setI32(ic_xyz.decompress(last_item_m.getZ().getI32(), 2));
+        return result;
+    }
 
-        this_item_m.pack(item);
-
-        System.arraycopy(item.array(), 1, last_item, 0, 28);
+    @Override
+    public boolean chunk_sizes() {
+        return false;
     }
 
 }

@@ -267,7 +267,7 @@ public class LASwaveform13reader {
 
     public boolean read_waveform(LASpoint point)
     {
-        int index = point.wavepacket.getIndex(); // unsigned
+        int index = point.getWavepacketDescriptorIndex(); // unsigned
         if (index == 0)
         {
             return FALSE;
@@ -299,11 +299,11 @@ public class LASwaveform13reader {
         }
 
         temporal = wave_packet_descr[index].getTemporalSpacing();
-        location = point.wavepacket.getLocation();
+        location = point.getWavepacketReturnPointWaveformLocation();
 
-        XYZt[0] = point.wavepacket.getXt();
-        XYZt[1] = point.wavepacket.getYt();
-        XYZt[2] = point.wavepacket.getZt();
+        XYZt[0] = point.getWavepacketParametricDx();
+        XYZt[1] = point.getWavepacketParametricDy();
+        XYZt[2] = point.getWavepacketParametricDz();
 
         XYZreturn[0] = point.get_x();
         XYZreturn[1] = point.get_y();
@@ -320,7 +320,7 @@ public class LASwaveform13reader {
 
         // read waveform
 
-        long position = start_of_waveform_data_packet_record + point.wavepacket.getOffset();
+        long position = start_of_waveform_data_packet_record + point.getWavepacketOffsetToWaveformData();
         stream.seek(position);
 
         if (wave_packet_descr[index].getCompressionType() == 0)

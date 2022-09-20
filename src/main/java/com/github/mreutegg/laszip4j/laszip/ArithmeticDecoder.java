@@ -53,10 +53,10 @@ import static java.lang.Integer.compareUnsigned;
 //                                                                           -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-public class ArithmeticDecoder {
+public class ArithmeticDecoder implements IByteStreamInProvider {
 
     private ByteStreamIn instream;
-    private int u_base, u_value, u_length;
+    private int u_value, u_length;
 
     public ArithmeticDecoder() {
         instream = null;
@@ -85,12 +85,12 @@ public class ArithmeticDecoder {
         m.init();
     }
 
-    ArithmeticModel createSymbolModel(int n)
+    public ArithmeticModel createSymbolModel(int n)
     {
         return new ArithmeticModel(n, false);
     }
 
-    void initSymbolModel(ArithmeticModel m) {
+    public void initSymbolModel(ArithmeticModel m) {
         initSymbolModel(m, null);
     }
 
@@ -120,7 +120,7 @@ public class ArithmeticDecoder {
         return u_sym;                                         // return data bit value
     }
 
-    int decodeSymbol(ArithmeticModel m) {
+    public int decodeSymbol(ArithmeticModel m) {
         int u_n, u_sym, u_x, u_y = u_length;
 
         if (m.u_decoder_table != null) {             // use table look-up for faster decoding
@@ -239,25 +239,35 @@ public class ArithmeticDecoder {
         return (char) u_sym;
     }
 
-    int readInt()
+    public int readInt()
     {
         int u_lowerInt = readShort();
         int u_upperInt = readShort();
         return (u_upperInt<<16)|u_lowerInt;
     }
 
-    float readFloat() /* danger in float reinterpretation */
+    public float readFloat() /* danger in float reinterpretation */
     {
         return Float.intBitsToFloat(readInt());
     }
 
-    long readInt64()
+    public long readInt64()
     {
         long u_lowerInt = readInt();
         long u_upperInt = readInt();
         return (u_upperInt<<32)|u_lowerInt;
     }
 
+    public void setByteStreamIn(ByteStreamIn instream)	
+    {	
+        this.instream = instream;
+    }
+
+    public ByteStreamIn getByteStreamIn()	
+    {	
+        return instream;	
+    }
+        
     double readDouble() /* danger in float reinterpretation */
     {
         return Double.longBitsToDouble(readInt64());

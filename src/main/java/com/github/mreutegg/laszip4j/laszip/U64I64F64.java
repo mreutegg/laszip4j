@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
 
 public class U64I64F64 {
 
-    private final ByteBuffer data = ByteBuffer.allocate(8);
+    private final ByteBuffer data;
 
     public static U64I64F64[] newU64I64F64Array(int size) {
         U64I64F64[] array = new U64I64F64[size];
@@ -24,6 +24,17 @@ public class U64I64F64 {
         return array;
     }
 
+    public U64I64F64() {	
+        this(ByteBuffer.allocate(8));	
+    }	
+    	
+    private U64I64F64(ByteBuffer buffer) {	
+        this.data = buffer.duplicate();	
+    }	
+    public static U64I64F64 wrap(ByteBuffer buffer) {	
+        return new U64I64F64(buffer);	
+    }
+    
     public void setU64(long value) {
         data.putLong(0, value);
     }

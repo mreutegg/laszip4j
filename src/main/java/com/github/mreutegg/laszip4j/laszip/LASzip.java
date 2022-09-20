@@ -16,12 +16,16 @@ import java.nio.ByteOrder;
 
 import static com.github.mreutegg.laszip4j.clib.Cstdio.fprintf;
 import static com.github.mreutegg.laszip4j.laszip.LASitem.Type.BYTE;
+import static com.github.mreutegg.laszip4j.laszip.LASitem.Type.BYTE14;
 import static com.github.mreutegg.laszip4j.laszip.LASitem.Type.GPSTIME11;
 import static com.github.mreutegg.laszip4j.laszip.LASitem.Type.POINT10;
 import static com.github.mreutegg.laszip4j.laszip.LASitem.Type.POINT14;
 import static com.github.mreutegg.laszip4j.laszip.LASitem.Type.RGB12;
+import static com.github.mreutegg.laszip4j.laszip.LASitem.Type.RGB14;
 import static com.github.mreutegg.laszip4j.laszip.LASitem.Type.RGBNIR14;
 import static com.github.mreutegg.laszip4j.laszip.LASitem.Type.WAVEPACKET13;
+import static com.github.mreutegg.laszip4j.laszip.LASitem.Type.WAVEPACKET14;
+
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
@@ -29,15 +33,16 @@ public class LASzip {
 
     private static final PrintStream stderr = System.err;
 
-    public static final int LASZIP_VERSION_MAJOR                = 2;
+    public static final int LASZIP_VERSION_MAJOR                = 3;
     public static final int LASZIP_VERSION_MINOR                = 4;
-    public static final int LASZIP_VERSION_REVISION             = 1;
-    public static final int LASZIP_VERSION_BUILD_DATE      = 150923;
+    public static final int LASZIP_VERSION_REVISION             = 3;
+    public static final int LASZIP_VERSION_BUILD_DATE      = 191111;
 
     public static final char LASZIP_COMPRESSOR_NONE              = 0;
     public static final char LASZIP_COMPRESSOR_POINTWISE         = 1;
     public static final char LASZIP_COMPRESSOR_POINTWISE_CHUNKED = 2;
-    public static final char LASZIP_COMPRESSOR_TOTAL_NUMBER_OF   = 3;
+    public static final char LASZIP_COMPRESSOR_LAYERED_CHUNKED   = 3;
+    public static final char LASZIP_COMPRESSOR_TOTAL_NUMBER_OF   = 4;
 
     public static final char LASZIP_COMPRESSOR_CHUNKED = LASZIP_COMPRESSOR_POINTWISE_CHUNKED;
     public static final char LASZIP_COMPRESSOR_NOT_CHUNKED = LASZIP_COMPRESSOR_POINTWISE;
@@ -49,6 +54,30 @@ public class LASzip {
 
     public static final int LASZIP_CHUNK_SIZE_DEFAULT           = 50000;
 
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_ALL                = 0xFFFFFFFF;
+
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY = 0x00000000;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_Z                  = 0x00000001;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION     = 0x00000002;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_FLAGS              = 0x00000004;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_INTENSITY          = 0x00000008;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE         = 0x00000010;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_USER_DATA          = 0x00000020;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE       = 0x00000040;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME           = 0x00000080;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_RGB                = 0x00000100;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_NIR                = 0x00000200;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_WAVEPACKET         = 0x00000400;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE0              = 0x00010000;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE1              = 0x00020000;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE2              = 0x00040000;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE3              = 0x00080000;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE4              = 0x00100000;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE5              = 0x00200000;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE6              = 0x00400000;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_BYTE7              = 0x00800000;
+    public static final int LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES        = 0xFFFF0000;
+        
     // pack to and unpack from VLR
     byte[] bytes; // unsigned
 
@@ -238,11 +267,23 @@ public class LASzip {
                 break;
             case POINT14:
                 if (item.size != 30) return return_error("POINT14 has size != 30");
-                if (item.version > 0) return return_error("POINT14 has version > 0");
+                if ((item.version != 0) && (item.version != 2) && (item.version != 3) && (item.version != 4)) return return_error("POINT14 has version != 0 and != 2 and != 3 and != 4"); // version == 2 from lasproto, version == 4 fixes context-switch
+                break;
+            case RGB14:
+                if (item.size != 6) return return_error("RGB14 has size != 6");
+                if ((item.version != 0) && (item.version != 2) && (item.version != 3) && (item.version != 4)) return return_error("RGB14 has version != 0 and != 2 and != 3 and != 4"); // version == 2 from lasproto, version == 4 fixes context-switch
+                break;
+            case BYTE14:
+                if (item.size < 1) return return_error("BYTE14 has size < 1");
+                if ((item.version != 0) && (item.version != 2) && (item.version != 3) && (item.version != 4)) return return_error("BYTE14 has version != 0 and != 2 and != 3 and != 4"); // version == 2 from lasproto, version == 4 fixes context-switch
                 break;
             case RGBNIR14:
                 if (item.size != 8) return return_error("RGBNIR14 has size != 8");
-                if (item.version > 0) return return_error("RGBNIR14 has version > 0");
+                if ((item.version != 0) && (item.version != 2) && (item.version != 3) && (item.version != 4)) return return_error("RGBNIR14 has version != 0 and != 2 and != 3 and != 4"); // version == 2 from lasproto, version == 4 fixes context-switch
+                break;
+            case WAVEPACKET14:
+                if (item.size != 29) return return_error("WAVEPACKET14 has size != 29");
+                if ((item.version != 0) && (item.version != 3) && (item.version != 4)) return return_error("WAVEPACKET14 has version != 0 and != 3 and != 4"); // version == 4 fixes context-switch
                 break;
             default:
                 {
@@ -475,34 +516,62 @@ public class LASzip {
         }
         if (have_rgb)
         {
+          if (have_point14)
+            {
             if (have_nir)
             {
-                items[0][i].type = RGBNIR14;
-                items[0][i].size = 8;
-                items[0][i].version = 0;
+              items[0][i].type = RGBNIR14;
+              items[0][i].size = 8;
+              items[0][i].version = 0;
             }
-            else
+                else
             {
-                items[0][i].type = RGB12;
-                items[0][i].size = 6;
-                items[0][i].version = 0;
+              items[0][i].type = RGB14;
+              items[0][i].size = 6;
+              items[0][i].version = 0;
             }
-            i++;
+          }
+          else
+          {
+            items[0][i].type = RGB12;
+            items[0][i].size = 6;
+            items[0][i].version = 0;
+          }
+          i++;
         }
         if (have_wavepacket)
         {
+          if (have_point14)
+            {
+            items[0][i].type = WAVEPACKET14;
+            items[0][i].size = 29;
+            items[0][i].version = 0;
+          }
+          else
+            {
             items[0][i].type = WAVEPACKET13;
             items[0][i].size = 29;
             items[0][i].version = 0;
-            i++;
+          }
+          i++;
         }
         if (extra_bytes_number != 0)
         {
-            items[0][i].type = BYTE;
-            items[0][i].size = (char) extra_bytes_number;
+          if (have_point14)
+            {
+            items[0][i].type = BYTE14;
+            items[0][i].size = (char)extra_bytes_number;
             items[0][i].version = 0;
-            i++;
+          }
+          else
+            {
+            items[0][i].type = BYTE;
+            items[0][i].size = (char)extra_bytes_number;
+            items[0][i].version = 0;
+          }
+          i++;
         }
+      
         if (compressor != 0) request_version((char) 2);
         assert(i == num_items[0]);
         return true;
@@ -529,7 +598,7 @@ public class LASzip {
         else
         {
             if (requested_version < 1) return return_error("with compression version is at least 1");
-            if (requested_version > 2) return return_error("version larger than 2 not supported");
+            if (requested_version > 4) return return_error("version larger than 4 not supported");
         }
         char i;
         for (i = 0; i < num_items; i++)
@@ -537,9 +606,13 @@ public class LASzip {
             switch (items[i].type)
             {
                 case POINT10:
+                case POINT14:
                 case GPSTIME11:
                 case RGB12:
+                case RGB14:
                 case BYTE:
+                case BYTE14:
+                case WAVEPACKET14:
                     items[i].version = requested_version;
                     break;
                 case WAVEPACKET13:
@@ -716,7 +789,7 @@ public class LASzip {
             }
             else
             {
-                if (items[1].is_type(RGB12))
+                if (items[1].is_type(RGB14))
                 {
                     if (num_items == 2)
                     {
@@ -726,7 +799,7 @@ public class LASzip {
                     }
                     else
                     {
-                        if (items[2].is_type(BYTE))
+                        if (items[2].is_type(BYTE) || items[2].is_type(BYTE14))
                         {
                             if (num_items == 3)
                             {
@@ -747,7 +820,7 @@ public class LASzip {
                     }
                     else
                     {
-                        if (items[2].is_type(WAVEPACKET13))
+                        if (items[2].is_type(WAVEPACKET13) || items[2].is_type(WAVEPACKET14))
                         {
                             if (num_items == 3)
                             {
@@ -757,7 +830,7 @@ public class LASzip {
                             }
                             else
                             {
-                                if (items[3].is_type(BYTE))
+                                if (items[3].is_type(BYTE) || items[3].is_type(BYTE14))
                                 {
                                     if (num_items == 4)
                                     {
@@ -768,7 +841,7 @@ public class LASzip {
                                 }
                             }
                         }
-                        else if (items[2].is_type(BYTE))
+                        else if (items[2].is_type(BYTE) || items[2].is_type(BYTE14))
                         {
                             if (num_items == 3)
                             {
@@ -779,7 +852,7 @@ public class LASzip {
                         }
                     }
                 }
-                else if (items[1].is_type(WAVEPACKET13))
+                else if (items[1].is_type(WAVEPACKET13) || items[1].is_type(WAVEPACKET14))
                 {
                     if (num_items == 2)
                     {
@@ -789,7 +862,7 @@ public class LASzip {
                     }
                     else
                     {
-                        if (items[2].is_type(BYTE))
+                        if (items[2].is_type(BYTE) || items[2].is_type(BYTE14))
                         {
                             if (num_items == 3)
                             {
@@ -800,7 +873,7 @@ public class LASzip {
                         }
                     }
                 }
-                else if (items[1].is_type(BYTE))
+                else if (items[1].is_type(BYTE) || items[1].is_type(BYTE14))
                 {
                     if (num_items == 2)
                     {

@@ -10,15 +10,10 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
-import java.nio.ByteBuffer;
-
-import static com.github.mreutegg.laszip4j.clib.Cstring.memcpy;
-import static java.lang.Boolean.TRUE;
-
 public class LASreadItemCompressed_RGB12_v1 extends LASreadItemCompressed {
 
     private ArithmeticDecoder dec;
-    private ByteBuffer last_item;
+    private PointDataRecordRGB last_item;
 
     private ArithmeticModel m_byte_used;
     private IntegerCompressor ic_rgb;
@@ -33,11 +28,11 @@ public class LASreadItemCompressed_RGB12_v1 extends LASreadItemCompressed {
         m_byte_used = dec.createSymbolModel(64);
         ic_rgb = new IntegerCompressor(dec, 8, 6);
 
-        /* create last item */
-        last_item = ByteBuffer.allocate(6);
+        last_item = null;
     }
 
-    public boolean init(byte[] item)
+    @Override	
+    public void init(PointDataRecord seedItem, int notUsed)
     {
         /* init state */
 
@@ -45,28 +40,49 @@ public class LASreadItemCompressed_RGB12_v1 extends LASreadItemCompressed {
         dec.initSymbolModel(m_byte_used);
         ic_rgb.initDecompressor();
 
-        /* init last item */
-        memcpy(last_item.array(), item, 6);
-        return TRUE;
+        last_item = (PointDataRecordRGB)seedItem;
     }
 
-    public void read(byte[] itemBytes)
-    {
-        ByteBuffer item = ByteBuffer.wrap(itemBytes);
-        
+    @Override	
+    public PointDataRecord read(int notUsed)
+    {       
+        PointDataRecordRGB result = new PointDataRecordRGB();
+
         int sym = dec.decodeSymbol(m_byte_used);
-        if ((sym & (1 << 0)) != 0) (item).putChar(0, (char)ic_rgb.decompress((last_item).getChar(0)&255, 0));
-        else (item).putChar(0, (char)((last_item).getChar(0)&0xFF));
-        if ((sym & (1 << 1)) != 0) (item).putChar(0, (char) (item.getChar(0) | (((char)ic_rgb.decompress((last_item).getChar(0)>>8, 1)) << 8)));
-        else (item).putChar(0, (char) (item.getChar(0) | ((last_item).getChar(0)&0xFF00)));
-        if ((sym & (1 << 2)) != 0) (item).putChar(2, (char)ic_rgb.decompress((last_item).getChar(2)&255, 2));
-        else (item).putChar(2, (char)((last_item).getChar(2)&0xFF));
-        if ((sym & (1 << 3)) != 0) (item).putChar(2, (char) (item.getChar(2) | (((char)ic_rgb.decompress((last_item).getChar(2)>>8, 3)) << 8)));
-        else (item).putChar(2, (char) (item.getChar(2) | ((last_item).getChar(2)&0xFF00)));
-        if ((sym & (1 << 4)) != 0) (item).putChar(4, (char)ic_rgb.decompress((last_item).getChar(4)&255, 4));
-        else (item).putChar(4, (char)((last_item).getChar(4)&0xFF));
-        if ((sym & (1 << 5)) != 0) (item).putChar(4, (char) (item.getChar(4) | (((char)ic_rgb.decompress((last_item).getChar(4)>>8, 5)) << 8)));
-        else (item).putChar(4, (char) (item.getChar(4) | ((last_item).getChar(4)&0xFF00)));
-        memcpy(last_item.array(), item.array(), 6);
+        if ((sym & (1 << 0)) != 0) 
+            result.R = (char)ic_rgb.decompress(last_item.R&255, 0);
+        else 
+            result.R = (char)(last_item.R&0xFF);
+        if ((sym & (1 << 1)) != 0) 
+            result.R |= (((char)ic_rgb.decompress(last_item.R>>8, 1)) << 8);
+        else 
+            result.R |= (last_item.R&0xFF00);
+        if ((sym & (1 << 2)) != 0) 
+            result.G = (char)ic_rgb.decompress(last_item.G&255, 2);
+        else 
+            result.G = (char)(last_item.G&0xFF);
+        if ((sym & (1 << 3)) != 0) 
+            result.G |= (((char)ic_rgb.decompress(last_item.G>>8, 3)) << 8);
+        else 
+            result.G |= (last_item.G&0xFF00);
+        if ((sym & (1 << 4)) != 0) 
+            result.B = (char)ic_rgb.decompress(last_item.B&255, 4);
+        else 
+            result.B = (char)(last_item.B&0xFF);
+        if ((sym & (1 << 5)) != 0) 
+            result.B |= (((char)ic_rgb.decompress(last_item.B>>8, 5)) << 8);
+        else 
+            result.B |= (last_item.B&0xFF00);
+
+        last_item.R = result.R;
+        last_item.G = result.G;
+        last_item.B = result.B;
+
+        return result;
+    }
+
+    @Override	
+    public boolean chunk_sizes() {	
+        return false;	
     }
 }

@@ -12,7 +12,7 @@ package com.github.mreutegg.laszip4j.laslib;
 
 public class LasDefinitions {
 
-    public static final int LAS_TOOLS_VERSION = 160730;
+    public static final int LAS_TOOLS_VERSION = 220310;
 
     public static final int LAS_TOOLS_FORMAT_DEFAULT = 0;
     public static final int LAS_TOOLS_FORMAT_LAS     = 1;

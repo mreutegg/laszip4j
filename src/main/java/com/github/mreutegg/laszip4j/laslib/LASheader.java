@@ -393,6 +393,9 @@ public class LASheader extends LASattributer {
             offset_to_point_data += 54;
             vlrs = new LASvlr[number_of_variable_length_records];
         }
+        if (null == vlrs[i])
+            vlrs[i] = new LASvlr();
+            
         vlrs[i].reserved = 0; // used to be 0xAABB
         vlrs[i].user_id = MyDefs.asByteArray(user_id);
         vlrs[i].record_id = record_id;

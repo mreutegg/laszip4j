@@ -487,7 +487,7 @@ public class LASwriterTXT extends LASwriter {
                     fprintf(file, "%d", point.get_return_number());
                     break;
                 case 'c': // the classification
-                    file.print(Byte.toUnsignedInt(point.get_classification()));
+                    file.print(point.get_classification());
                     break;
                 case 'u': // the user data
                     fprintf(file, "%d", point.get_user_data());
@@ -529,10 +529,14 @@ public class LASwriterTXT extends LASwriter {
                     fprintf(file, "%d", p_count);
                     break;
                 case 'w': // the wavepacket descriptor index
-                    fprintf(file, "%d", point.wavepacket.getIndex());
+                    fprintf(file, "%d", point.getWavepacketDescriptorIndex());
                     break;
                 case 'W': // all wavepacket attributes
-                    fprintf(file, "%d%c%d%c%d%c%g%c%.15g%c%.15g%c%.15g", point.wavepacket.getIndex(), separator_sign, (int)point.wavepacket.getOffset(), separator_sign, point.wavepacket.getSize(), separator_sign, point.wavepacket.getLocation(), separator_sign, point.wavepacket.getXt(), separator_sign, point.wavepacket.getYt(), separator_sign, point.wavepacket.getZt());
+                    fprintf(file, "%d%c%d%c%d%c%g%c%.15g%c%.15g%c%.15g", 
+                        point.getWavepacketDescriptorIndex(), separator_sign, (int)point.getWavepacketOffsetToWaveformData(), separator_sign, 
+                        point.getWavepacketPacketSize(), separator_sign, point.getWavepacketReturnPointWaveformLocation() , separator_sign, 
+                        point.getWavepacketParametricDx(), separator_sign, point.getWavepacketParametricDy(), separator_sign, 
+                        point.getWavepacketParametricDz());
                     break;
                 case 'X': // the unscaled and unoffset integer X coordinate
                     fprintf(file, "%d", point.get_X());

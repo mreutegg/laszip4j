@@ -15,8 +15,6 @@ import com.github.mreutegg.laszip4j.laslib.LASreader;
 import com.github.mreutegg.laszip4j.laslib.LASwaveform13reader;
 import com.github.mreutegg.laszip4j.laslib.LASwaveform13writer;
 import com.github.mreutegg.laszip4j.laslib.LASwriter;
-import com.github.mreutegg.laszip4j.laslib.LASwriterCompatibleDown;
-import com.github.mreutegg.laszip4j.laslib.LASwriterCompatibleUp;
 import com.github.mreutegg.laszip4j.laslib.LasDefinitions;
 import com.github.mreutegg.laszip4j.laszip.ByteStreamIn;
 import com.github.mreutegg.laszip4j.laslib.LASreadOpener;
@@ -26,14 +24,12 @@ import com.github.mreutegg.laszip4j.laszip.LASquadtree;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.mreutegg.laszip4j.clib.Cstdio.fprintf;
 import static com.github.mreutegg.laszip4j.clib.Cstdlib.atof;
 import static com.github.mreutegg.laszip4j.clib.Cstdlib.atoi;
-import static com.github.mreutegg.laszip4j.clib.Cstring.memcmp;
 import static com.github.mreutegg.laszip4j.clib.Cstring.strcmp;
 import static com.github.mreutegg.laszip4j.laslib.LasDefinitions.LAS_TOOLS_FORMAT_LAS;
 import static com.github.mreutegg.laszip4j.laslib.LasDefinitions.LAS_TOOLS_FORMAT_LAZ;
@@ -66,9 +62,6 @@ public class Laszip {
         boolean format_not_specified = false;
         boolean lax = false;
         boolean append = false;
-        boolean remain_compatible = false;
-        boolean move_CRS = false;
-        boolean move_all = false;
         float tile_size = 100.0f;
         int threshold = 1000;
         int minimum_points = 100000;
@@ -131,18 +124,6 @@ public class Laszip {
             else if (strcmp(argv[i],"-append") == 0)
             {
                 append = TRUE;
-            }
-            else if (strcmp(argv[i],"-remain_compatible") == 0)
-            {
-                remain_compatible = TRUE;
-            }
-            else if (strcmp(argv[i],"-move_CRS") == 0)
-            {
-                move_CRS = TRUE;
-            }
-            else if (strcmp(argv[i],"-move_all") == 0)
-            {
-                move_all = TRUE;
             }
             else if (strcmp(argv[i],"-eop") == 0)
             {
@@ -306,6 +287,8 @@ public class Laszip {
                 // maybe only a dry read pass
                 start_time = taketime();
                 while (lasreader.read_point());
+                    //System.out.println( lasreader.point.toString() );
+
                 if (check_integrity)
                 {
                     if (lasreader.p_count != lasreader.npoints)
@@ -415,43 +398,7 @@ public class Laszip {
 
                 // open laswriter
 
-                LASwriter laswriter = null;
-
-                if (lasreader.header.point_data_format > 5)
-                {
-                    LASwriterCompatibleDown laswritercompatibledown = new LASwriterCompatibleDown();
-                    if (laswritercompatibledown.open(lasreader.header, laswriteopener, move_CRS, move_all))
-                    {
-                        laswriter = laswritercompatibledown;
-                    }
-                    else
-                    {
-                        fprintf(stderr, "ERROR: could not open laswritercompatibledown\n");
-                    }
-                }
-                else if (!remain_compatible
-                        && (lasreader.header.point_data_format != 0)
-                        && (lasreader.header.point_data_format != 2)
-                        && lasreader.header.get_vlr("lascompatible", 22204) != null
-                        && (lasreader.header.get_attribute_index("LAS 1.4 scan angle") >= 0)
-                        && (lasreader.header.get_attribute_index("LAS 1.4 extended returns") >= 0)
-                        && (lasreader.header.get_attribute_index("LAS 1.4 classification") >= 0)
-                        && (lasreader.header.get_attribute_index("LAS 1.4 flags and channel") >= 0))
-                {
-                    LASwriterCompatibleUp laswritercompatibleup = new LASwriterCompatibleUp();
-                    if (laswritercompatibleup.open(lasreader.header, laswriteopener))
-                    {
-                        laswriter = laswritercompatibleup;
-                    }
-                    else
-                    {
-                        fprintf(stderr, "ERROR: could not open laswritercompatibleup\n");
-                    }
-                }
-                else
-                {
-                    laswriter = laswriteopener.open(lasreader.header);
-                }
+                LASwriter laswriter = laswriteopener.open(lasreader.header);
 
                 if (laswriter == null)
                 {
@@ -467,9 +414,9 @@ public class Laszip {
                     for (i = 0; i < 255; i++) if (lasreader.header.vlr_wave_packet_descr[i] != null) lasreader.header.vlr_wave_packet_descr[i].setCompressionType(compression_type);
 
                     long u_last_offset = 0;
-                    int u_last_size = 60;
+                    long u_last_size = 60;
                     long u_new_offset = 0;
-                    int u_new_size = 0;
+                    long u_new_size = 0;
                     int u_waves_written = 0;
                     int u_waves_referenced = 0;
 
@@ -490,68 +437,74 @@ public class Laszip {
 
                     while (lasreader.read_point())
                     {
-                        if (lasreader.point.wavepacket.getIndex() != 0) // if point is attached to a waveform
+                        if (lasreader.point.getWavepacketDescriptorIndex() != 0) // if point is attached to a waveform
                         {
                             u_waves_referenced++;
-                            if (lasreader.point.wavepacket.getOffset() == u_last_offset)
+                            if (lasreader.point.getWavepacketOffsetToWaveformData()  == u_last_offset)
                             {
-                                lasreader.point.wavepacket.setOffset(u_new_offset);
-                                lasreader.point.wavepacket.setSize(u_new_size);
+                                lasreader.point.setWavepacketOffsetToWaveformData(u_new_offset);
+                                lasreader.point.setWavepacketPacketSize(u_new_size);
                             }
-                            else if (lasreader.point.wavepacket.getOffset() > u_last_offset)
+                            else if (lasreader.point.getWavepacketOffsetToWaveformData() > u_last_offset)
                             {
-                                if (lasreader.point.wavepacket.getOffset() > (u_last_offset + u_last_size))
+                                if (lasreader.point.getWavepacketOffsetToWaveformData() > (u_last_offset + u_last_size))
                                 {
                                     if (!waveform_with_map)
                                     {
                                         fprintf(stderr,"WARNING: gap in waveform offsets.\n");
-                                        fprintf(stderr,"WARNING: last offset plus size was %lld but new offset is %lld (for point %lld)\n", (u_last_offset + u_last_size), lasreader.point.wavepacket.getOffset(), lasreader.p_count);
+                                        fprintf(stderr,"WARNING: last offset plus size was %lld but new offset is %lld (for point %lld)\n", 
+                                            (u_last_offset + u_last_size), 
+                                            lasreader.point.getWavepacketOffsetToWaveformData() , lasreader.p_count);
                                     }
                                 }
                                 u_waves_written++;
-                                u_last_offset = lasreader.point.wavepacket.getOffset();
-                                u_last_size = lasreader.point.wavepacket.getSize();
+                                u_last_offset = lasreader.point.getWavepacketOffsetToWaveformData();
+                                u_last_size = lasreader.point.getWavepacketPacketSize();
                                 laswaveform13reader.read_waveform(lasreader.point);
                                 laswaveform13writer.write_waveform(lasreader.point, laswaveform13reader.samples);
-                                u_new_offset = lasreader.point.wavepacket.getOffset();
-                                u_new_size = lasreader.point.wavepacket.getSize();
+                                u_new_offset = lasreader.point.getWavepacketOffsetToWaveformData();
+                                u_new_size = lasreader.point.getWavepacketPacketSize();
                                 if (waveform_with_map)
                                 {
-                                    offset_size_map.put(u_last_offset, new OffsetSize(u_new_offset,u_new_size));
+                                    offset_size_map.put(u_last_offset, new OffsetSize((int)u_new_offset,(int)u_new_size));
                                 }
                             }
                             else
                             {
                                 if (waveform_with_map)
                                 {
-                                    OffsetSize map_element = offset_size_map.get(lasreader.point.wavepacket.getOffset());
+                                    OffsetSize map_element = offset_size_map.get(lasreader.point.getWavepacketOffsetToWaveformData());
                                     if (map_element == null)
                                     {
                                         u_waves_written++;
-                                        u_last_offset = lasreader.point.wavepacket.getOffset();
-                                        u_last_size = lasreader.point.wavepacket.getSize();
+                                        u_last_offset = lasreader.point.getWavepacketOffsetToWaveformData();
+                                        u_last_size = lasreader.point.getWavepacketPacketSize();
                                         laswaveform13reader.read_waveform(lasreader.point);
                                         laswaveform13writer.write_waveform(lasreader.point, laswaveform13reader.samples);
-                                        u_new_offset = lasreader.point.wavepacket.getOffset();
-                                        u_new_size = lasreader.point.wavepacket.getSize();
-                                        offset_size_map.put(u_last_offset, new OffsetSize(u_new_offset,u_new_size));
+                                        u_new_offset = lasreader.point.getWavepacketOffsetToWaveformData();
+                                        u_new_size = lasreader.point.getWavepacketPacketSize();
+                                        offset_size_map.put(u_last_offset, new OffsetSize((int)u_new_offset,(int)u_new_size));
                                     }
                                     else
                                     {
-                                        lasreader.point.wavepacket.setOffset(map_element.offset);
-                                        lasreader.point.wavepacket.setSize(map_element.size);
+                                        lasreader.point.setWavepacketOffsetToWaveformData(map_element.offset);
+                                        lasreader.point.setWavepacketPacketSize(map_element.size);
                                     }
                                 }
                                 else
                                 {
                                     fprintf(stderr,"ERROR: waveform offsets not in monotonically increasing order.\n");
-                                    fprintf(stderr,"ERROR: last offset was %lld but new offset is %lld (for point %lld)\n", u_last_offset, lasreader.point.wavepacket.getOffset(), lasreader.p_count);
+                                    fprintf(stderr,"ERROR: last offset was %lld but new offset is %lld (for point %lld)\n", 
+                                        u_last_offset, lasreader.point.getWavepacketOffsetToWaveformData(), lasreader.p_count);
                                     fprintf(stderr,"ERROR: use option '-waveforms_with_map' to compress.\n");
                                     byebye(true);
                                 }
                             }
                         }
-                        laswriter.write_point(lasreader.point);
+
+                        if ( null != laswriter)
+                            laswriter.write_point(lasreader.point);
+
                         if (lax)
                         {
                             lasindex.add(lasreader.point.get_x(), lasreader.point.get_y(), (int)(laswriter.p_count));
@@ -562,15 +515,18 @@ public class Laszip {
                         }
                     }
 
-                    if (verbose && ((laswriter.p_count % 1000000) == 0)) fprintf(stderr,"written %d referenced %d of %d points\n", u_waves_written, u_waves_referenced, laswriter.p_count);
-
-                    if (!lasreadopener.is_header_populated())
+                    if ( null != laswriter ) 
                     {
-                        laswriter.update_header(lasreader.header, TRUE);
-                    }
+                        if (verbose && ((laswriter.p_count % 1000000) == 0)) fprintf(stderr,"written %d referenced %d of %d points\n", u_waves_written, u_waves_referenced, laswriter.p_count);
 
-                    // flush the writer
-                    bytes_written = laswriter.close();
+                        if (!lasreadopener.is_header_populated())
+                        {
+                            laswriter.update_header(lasreader.header, TRUE);
+                        }
+
+                        // flush the writer
+                        bytes_written = laswriter.close();
+                    }
 
                     if (lax)
                     {
@@ -633,31 +589,34 @@ public class Laszip {
                         {
                             if (end_of_points > -1)
                             {
-                                byte[] point10 = new byte[20];
-                                Arrays.fill(point10, (byte) end_of_points);
-
                                 if (verbose) fprintf(stderr, "writing with end_of_points value %d\n", end_of_points);
 
                                 while (lasreader.read_point())
                                 {
-                                    if (memcmp(point10, lasreader.point.asTwentyBytes(), 20) == 0)
+                                    if ( null != laswriter)
                                     {
-                                        break;
+                                        laswriter.write_point(lasreader.point);
+                                        laswriter.update_inventory(lasreader.point);
                                     }
-                                    laswriter.write_point(lasreader.point);
-                                    laswriter.update_inventory(lasreader.point);
                                 }
-                                laswriter.update_header(lasreader.header, TRUE);
+                                if (null != laswriter)
+                                    laswriter.update_header(lasreader.header, TRUE);
                             }
                             else
                             {
                                 while (lasreader.read_point())
                                 {
-                                    laswriter.write_point(lasreader.point);
+                                    if ( null != laswriter)
+                                        laswriter.write_point(lasreader.point);
+                                    
+                                    System.out.println(lasreader.point.get_x()+" "+lasreader.point.get_y()+" ="+lasreader.point.get_z()+" "+lasreader.point.getIntensity()+" "+lasreader.point.getClassification());
                                 }
                             }
-                            // flush the writer
-                            bytes_written = laswriter.close();
+                            if ( null != laswriter)
+                            {
+                                // flush the writer
+                                bytes_written = laswriter.close();
+                            }
                         }
                     }
                     else
@@ -701,36 +660,38 @@ public class Laszip {
                         {
                             if (end_of_points > -1)
                             {
-                                byte[] point10 = new byte[20];
-                                Arrays.fill(point10, (byte) end_of_points);
-
                                 if (verbose) fprintf(stderr, "writing with end_of_points value %d\n", end_of_points);
 
                                 while (lasreader.read_point())
                                 {
-                                    if (memcmp(point10, lasreader.point.asTwentyBytes(), 20) == 0)
+                                    if ( null != laswriter )
                                     {
-                                        break;
+                                        laswriter.write_point(lasreader.point);
+                                        laswriter.update_inventory(lasreader.point);
                                     }
-                                    laswriter.write_point(lasreader.point);
-                                    laswriter.update_inventory(lasreader.point);
                                 }
                             }
                             else
                             {
                                 while (lasreader.read_point())
                                 {
-                                    laswriter.write_point(lasreader.point);
-                                    laswriter.update_inventory(lasreader.point);
+                                    if ( null != laswriter )
+                                    {
+                                        laswriter.write_point(lasreader.point);
+                                        laswriter.update_inventory(lasreader.point);
+                                    }
                                 }
                             }
                         }
 
-                        // update the header
-                        laswriter.update_header(lasreader.header, TRUE);
+                        if ( null != laswriter )
+                        {
+                            // update the header
+                            laswriter.update_header(lasreader.header, TRUE);
 
-                        // flush the writer
-                        bytes_written = laswriter.close();
+                            // flush the writer
+                            bytes_written = laswriter.close();
+                        }
                     }
                 }
 

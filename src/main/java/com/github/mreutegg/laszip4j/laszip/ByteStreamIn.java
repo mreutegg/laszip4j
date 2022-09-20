@@ -60,4 +60,8 @@ public abstract class ByteStreamIn implements Closeable {
     /* constructor                                               */
     public ByteStreamIn() { u_bit_buffer = 0; u_num_buffer = 0; };
 
+    public boolean skipBytes(int num_bytes) 	
+    { 	
+        return seek(tell() + num_bytes); 	
+    }
 }

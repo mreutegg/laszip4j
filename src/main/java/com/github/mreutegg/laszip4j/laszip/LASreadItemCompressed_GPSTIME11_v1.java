@@ -10,16 +10,13 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
-import java.nio.ByteBuffer;
-
-import static java.lang.Boolean.TRUE;
-
 public class LASreadItemCompressed_GPSTIME11_v1 extends LASreadItemCompressed {
 
     private static final int LASZIP_GPSTIME_MULTIMAX = 512;
 
     private ArithmeticDecoder dec;
-    private U64I64F64 last_gpstime = new U64I64F64();
+
+    private PointDataRecordGpsTime last_item = new PointDataRecordGpsTime();
 
     private ArithmeticModel m_gpstime_multi;
     private ArithmeticModel m_gpstime_0diff;
@@ -39,7 +36,8 @@ public class LASreadItemCompressed_GPSTIME11_v1 extends LASreadItemCompressed {
         ic_gpstime = new IntegerCompressor(dec, 32, 6); // 32 bits, 6 contexts
     }
 
-    public boolean init(byte[] item)
+    @Override
+    public void init(PointDataRecord seedItem, int notUsed)
     {
         /* init state */
         last_gpstime_diff = 0;
@@ -50,12 +48,11 @@ public class LASreadItemCompressed_GPSTIME11_v1 extends LASreadItemCompressed {
         dec.initSymbolModel(m_gpstime_0diff);
         ic_gpstime.initDecompressor();
 
-        /* init last item */
-        last_gpstime.setU64(ByteBuffer.wrap(item).getLong());
-        return TRUE;
+        last_item = (PointDataRecordGpsTime)seedItem;
     }
 
-    public void read(byte[] item)
+    @Override
+    public PointDataRecordGpsTime read(int notUsed)
     {
         int multi;
         if (last_gpstime_diff == 0) // if the last integer difference was zero
@@ -64,11 +61,11 @@ public class LASreadItemCompressed_GPSTIME11_v1 extends LASreadItemCompressed {
             if (multi == 1) // the difference can be represented with 32 bits
             {
                 last_gpstime_diff = ic_gpstime.decompress(0, 0);
-                last_gpstime.setI64(last_gpstime.getI64() + last_gpstime_diff);
+                last_item.GPSTime += last_gpstime_diff;
             }
             else if (multi == 2) // the difference is huge
             {
-                last_gpstime.setU64(dec.readInt64());
+                last_item.GPSTime = dec.readInt64();
             }
         }
         else
@@ -115,13 +112,22 @@ public class LASreadItemCompressed_GPSTIME11_v1 extends LASreadItemCompressed {
                         }
                     }
                 }
-                last_gpstime.setI64(last_gpstime.getI64() + gpstime_diff);
+                last_item.GPSTime += gpstime_diff;
             }
             else if (multi <  LASZIP_GPSTIME_MULTIMAX-1)
             {
-                last_gpstime.setU64(dec.readInt64());
+                last_item.GPSTime = dec.readInt64();
             }
         }
-        ByteBuffer.wrap(item).putLong(last_gpstime.getI64());
+
+        PointDataRecordGpsTime result = new PointDataRecordGpsTime();
+        result.GPSTime = last_item.GPSTime;
+
+        return result;
+    }
+
+    @Override
+    public boolean chunk_sizes() {
+        return false;
     }
 }

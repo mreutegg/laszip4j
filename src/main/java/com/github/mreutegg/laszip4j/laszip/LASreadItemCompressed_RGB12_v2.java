@@ -10,16 +10,13 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
-import java.nio.ByteBuffer;
-
 import static com.github.mreutegg.laszip4j.laszip.MyDefs.U8_CLAMP;
 import static com.github.mreutegg.laszip4j.laszip.MyDefs.U8_FOLD;
-import static java.lang.Boolean.TRUE;
 
 public class LASreadItemCompressed_RGB12_v2 extends LASreadItemCompressed {
 
     private ArithmeticDecoder dec;
-    private char[] last_item = new char[3];
+    private PointDataRecordRGB last_item = null;
 
     private ArithmeticModel m_byte_used;
     private ArithmeticModel m_rgb_diff_0;
@@ -45,7 +42,8 @@ public class LASreadItemCompressed_RGB12_v2 extends LASreadItemCompressed {
         m_rgb_diff_5 = dec.createSymbolModel(256);
     }
 
-    public boolean init(byte[] item)
+    @Override
+    public void init(PointDataRecord seedItem, int notUsed)
     {
         /* init state */
 
@@ -58,96 +56,100 @@ public class LASreadItemCompressed_RGB12_v2 extends LASreadItemCompressed {
         dec.initSymbolModel(m_rgb_diff_4);
         dec.initSymbolModel(m_rgb_diff_5);
 
-        /* init last item */
-        memcpy(last_item, item, 6);
-        return TRUE;
+        last_item = (PointDataRecordRGB)seedItem;
     }
 
-    public void read(byte[] itemBytes)
+    @Override
+    public PointDataRecord read(int notUsed)
     {
-        ByteBuffer item = ByteBuffer.wrap(itemBytes);
-        byte corr;
+        int corr;
         int diff = 0;
         int sym = dec.decodeSymbol(m_byte_used);
+
+        PointDataRecordRGB result = new PointDataRecordRGB();
+
         if ((sym & (1 << 0)) != 0)
         {
-            corr = (byte) dec.decodeSymbol(m_rgb_diff_0);
-            byte b = U8_FOLD(corr + (last_item[0] & 255));
-            item.putChar(0, (char) Byte.toUnsignedInt(b));
+          corr = dec.decodeSymbol(m_rgb_diff_0);
+          byte b = U8_FOLD(corr + (last_item.R & 255));
+          result.R = (char)Byte.toUnsignedInt(b);
         }
-        else
+        else 
         {
-            item.putChar(0, (char) (last_item[0]&0xFF));
+          result.R = (char)(last_item.R&0xFF);
         }
         if ((sym & (1 << 1)) != 0)
         {
-            corr = (byte) dec.decodeSymbol(m_rgb_diff_1);
-            byte b = U8_FOLD(corr + (last_item[0] >>> 8));
-            item.putChar(0, (char) (item.getChar(0) | (((char) Byte.toUnsignedInt(b)) << 8)));
+          corr = dec.decodeSymbol(m_rgb_diff_1);
+          byte b = U8_FOLD(corr + (last_item.R >>> 8));
+          result.R |= (((char) Byte.toUnsignedInt(b)) << 8);
         }
         else
         {
-            item.putChar(0, (char) (item.getChar(0) | (last_item[0]&0xFF00)));
+          result.R |= (last_item.R&0xFF00);
         }
         if ((sym & (1 << 6)) != 0)
         {
-            diff = ((item.getChar(0)&0x00FF) - (last_item[0]&0x00FF));
-            if ((sym & (1 << 2)) != 0)
-            {
-                corr = (byte) dec.decodeSymbol(m_rgb_diff_2);
-                byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item[1] & 255)));
-                item.putChar(2, (char) Byte.toUnsignedInt(b));
-            }
-            else
-            {
-                item.putChar(2, (char)(last_item[1]&0xFF));
-            }
-            if ((sym & (1 << 4)) != 0)
-            {
-                corr = (byte) dec.decodeSymbol(m_rgb_diff_4);
-                diff = (diff + ((item.getChar(2)&0x00FF) - (last_item[1]&0x00FF))) / 2;
-                byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item[2] & 255)));
-                item.putChar(4, (char) Byte.toUnsignedInt(b));
-            }
-            else
-            {
-                item.putChar(4, (char) (last_item[2]&0xFF));
-            }
-            diff = (item.getChar(0)>>>8) - (last_item[0]>>>8);
-            if ((sym & (1 << 3)) != 0)
-            {
-                corr = (byte) dec.decodeSymbol(m_rgb_diff_3);
-                byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item[1] >>> 8)));
-                item.putChar(2, (char) (item.getChar(2) | (((char) Byte.toUnsignedInt(b)) << 8)));
-            }
-            else
-            {
-                item.putChar(2, (char) (item.getChar(2) | (last_item[1]&0xFF00)));
-            }
-            if ((sym & (1 << 5)) != 0)
-            {
-                corr = (byte) dec.decodeSymbol(m_rgb_diff_5);
-                diff = (diff + ((item.getChar(2)>>>8) - (last_item[1]>>>8))) / 2;
-                byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item[2] >>> 8)));
-                item.putChar(4, (char) (item.getChar(4) | (((char) Byte.toUnsignedInt(b)) << 8)));
-            }
-            else
-            {
-                item.putChar(4, (char) (item.getChar(4) | (last_item[2]&0xFF00)));
-            }
+          diff = (result.R&0x00FF) - (last_item.R&0x00FF);
+          if ((sym & (1 << 2)) != 0)
+          {
+            corr = dec.decodeSymbol(m_rgb_diff_2);
+            byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item.G & 255)));
+            result.G = (char) Byte.toUnsignedInt(b);
+          }
+          else
+          {
+            result.G = (char)(last_item.G&0xFF);
+          }
+          if ((sym & (1 << 4)) != 0)
+          {
+            corr = dec.decodeSymbol(m_rgb_diff_4);
+            diff = (diff + ((result.G&0x00FF) - (last_item.G&0x00FF))) / 2;
+            byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item.B & 255)));
+            result.B = (char) Byte.toUnsignedInt(b);
+          }
+          else
+          {
+            result.B = (char)(last_item.B&0xFF);
+          }
+          diff = (result.R>>>8) - (last_item.R>>>8);
+          if ((sym & (1 << 3)) != 0)
+          {
+            corr = dec.decodeSymbol(m_rgb_diff_3);
+            byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item.G >>> 8)));
+            result.G |= (((char) Byte.toUnsignedInt(b)) << 8);
+          }
+          else
+          {
+            result.G |= (last_item.G&0xFF00);
+          }
+          if ((sym & (1 << 5)) != 0)
+          {
+            corr = dec.decodeSymbol(m_rgb_diff_5);
+            diff = (diff + ((result.G>>>8) - (last_item.G>>>8))) / 2;
+            byte b = U8_FOLD(corr + U8_CLAMP(diff + (last_item.B >>> 8)));
+            result.B |= (((char) Byte.toUnsignedInt(b)) << 8);
+          }
+          else
+          {
+            result.B |= (last_item.B&0xFF00);
+          }
         }
         else
         {
-            item.putChar(2, item.getChar(0));
-            item.putChar(4, item.getChar(0));
+          result.G = result.R;
+          result.B = result.R;
         }
-        memcpy(last_item, item.array(), 6);
+
+        last_item.R = result.R;
+        last_item.G = result.G;
+        last_item.B = result.B;
+      
+        return result;
     }
 
-    private static void memcpy(char[] dest, byte[] src, int num) {
-        ByteBuffer srcBuffer = ByteBuffer.wrap(src);
-        for (int i = 0; i < num / 2; i++) {
-            dest[i] = srcBuffer.getChar(i * 2);
-        }
+    @Override
+    public boolean chunk_sizes() {
+        return false;
     }
 }
