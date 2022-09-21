@@ -16,7 +16,7 @@ in Switzerland, which works fine.
 Usage is the same as with the native laszip utility, but invoked as a runnable
 jar:
 
-    java -jar laszip4j-0.8.jar -oparse xyzc -keep_class 3 4 5 6 10 -i 7015_2640.laz -o 7015_2640.xyzk
+    java -jar laszip4j-0.10.jar -oparse xyzc -keep_class 3 4 5 6 10 -i 7015_2640.laz -o 7015_2640.xyzk
     
 On top of LASzip and LAStools this library also provides convenience classes
 for reading LAS points. You can read LAS points in your code like this:
