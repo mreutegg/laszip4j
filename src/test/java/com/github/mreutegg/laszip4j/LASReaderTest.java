@@ -99,7 +99,10 @@ public class LASReaderTest {
         assertEquals("LASF", header.getFileSignature());
         List<LASExtendedVariableLengthRecord> evlrs = StreamSupport.stream(header.getExtendedVariableLengthRecords().spliterator(), false).collect(Collectors.toList());
         assertEquals(header.getNumberOfExtendedVariableLengthRecords(), evlrs.size());
+        assertEquals(0, evlrs.get(0).getReserved());
         assertEquals("copc", evlrs.get(0).getUserID());
+        assertEquals(1000, evlrs.get(0).getRecordID());
+        assertEquals(8896, evlrs.get(0).getRecordLength());
         assertEquals("EPT Hierarchy", evlrs.get(0).getDescription());
         long numPoints = 0;
         for (LASPoint p : reader.getPoints()) {
