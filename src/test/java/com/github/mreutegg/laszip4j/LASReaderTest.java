@@ -27,6 +27,7 @@ import java.io.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -43,9 +44,15 @@ public class LASReaderTest {
     private static final String LAS_BASE_URL = "https://dc-lidar-2018.s3.amazonaws.com/Classified_LAS";
     private static final int LAS_NUM_POINT_RECORDS = 1653361;
 
+    private static final String LAZ_14_NAME = "autzen-classified.copc.laz";
+    private static final String LAZ_14_BASE_URL = "https://github.com/PDAL/data/raw/master/autzen";
+    private static final int LAZ_14_NUM_POINT_RECORDS = 10653336;
+
     private final File target = new File("target");
     private final File laz = new File(target, LAZ_NAME);
     private final File las = new File(target, LAS_NAME);
+
+    private final File laz14 = new File(target, LAZ_14_NAME);
 
     @Before
     public void before() throws Exception {
@@ -69,6 +76,52 @@ public class LASReaderTest {
                 }
             }
         }
+        if (!laz14.exists()) {
+            URI url = new URI(LAZ_14_BASE_URL + "/" + LAZ_14_NAME);
+            try (CloseableHttpClient client = HttpClients.createDefault()) {
+                try (CloseableHttpResponse response = client.execute(new HttpGet(url))) {
+                    try (OutputStream out = new FileOutputStream(laz14)) {
+                        response.getEntity().writeTo(out);
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void readLaz14() {
+        LASReader reader = new LASReader(laz14);
+        LASHeader header = reader.getHeader();
+
+        assertEquals(header.getNumberOfVariableLengthRecords(), StreamSupport.stream(header.getVariableLengthRecords().spliterator(), false).count());
+
+        long[] classifications = new long[Byte.MAX_VALUE];
+        assertEquals("LASF", header.getFileSignature());
+        List<LASExtendedVariableLengthRecord> evlrs = StreamSupport.stream(header.getExtendedVariableLengthRecords().spliterator(), false).collect(Collectors.toList());
+        assertEquals(header.getNumberOfExtendedVariableLengthRecords(), evlrs.size());
+        assertEquals("copc", evlrs.get(0).getUserID());
+        assertEquals("EPT Hierarchy", evlrs.get(0).getDescription());
+        long numPoints = 0;
+        for (LASPoint p : reader.getPoints()) {
+            classifications[p.getClassification()]++;
+            numPoints++;
+        }
+        assertEquals(LAZ_14_NUM_POINT_RECORDS, header.getLegacyNumberOfPointRecords());
+        assertEquals(LAZ_14_NUM_POINT_RECORDS, numPoints);
+        assertEquals(390708, classifications[0]);   // never classified
+        assertEquals(6909405, classifications[2]);  // ground
+        assertEquals(2613807, classifications[5]);  // high vegetation
+        assertEquals(343181, classifications[6]);   // building
+        assertEquals(355339, classifications[9]);   // water
+        assertEquals(51, classifications[15]);      // tower
+        assertEquals(6790, classifications[17]);    // bridge deck
+        assertEquals(4224, classifications[64]);    // extended classification 64
+        assertEquals(18774, classifications[65]);   // extended classification 65
+        assertEquals(92, classifications[66]);      // extended classification 66
+        assertEquals(1233, classifications[68]);    // extended classification 68
+        assertEquals(5882, classifications[73]);    // extended classification 73
+        assertEquals(221, classifications[76]);     // extended classification 76
+        assertEquals(24, classifications[77]);      // extended classification 77
     }
 
     @Test
