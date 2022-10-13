@@ -855,6 +855,7 @@ public class LASreaderLAS extends LASreader {
 
                     for (i = 0; i < header.number_of_extended_variable_length_records; i++)
                     {
+                        header.evlrs[i] = new LASevlr();
                         // read variable length records variable after variable (to avoid alignment issues)
 
                         try { header.evlrs[i].reserved = stream.get16bitsLE(); } catch (Exception e)

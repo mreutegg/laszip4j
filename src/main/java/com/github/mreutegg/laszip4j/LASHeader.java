@@ -16,6 +16,7 @@
  */
 package com.github.mreutegg.laszip4j;
 
+import com.github.mreutegg.laszip4j.laslib.LASevlr;
 import com.github.mreutegg.laszip4j.laslib.LASheader;
 import com.github.mreutegg.laszip4j.laslib.LASvlr;
 
@@ -306,5 +307,13 @@ public final class LASHeader {
             records.add(new LASVariableLengthRecord(vlr));
         }
         return records.subList(0, getNumberOfVariableLengthRecords());
+    }
+
+    public Iterable<LASExtendedVariableLengthRecord> getExtendedVariableLengthRecords() {
+        List<LASExtendedVariableLengthRecord> records = new ArrayList<>();
+        for (LASevlr vlr : header.evlrs) {
+            records.add(new LASExtendedVariableLengthRecord(vlr));
+        }
+        return records.subList(0, getNumberOfExtendedVariableLengthRecords());
     }
 }

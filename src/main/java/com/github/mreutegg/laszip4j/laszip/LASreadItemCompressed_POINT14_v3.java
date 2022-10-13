@@ -585,8 +585,8 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
             // So scan_direction_flag is at bit 4, and edge_of_flight_line is at bit 5
             // (classification flags are per spec, 4 bits covering bits 0-3)
             
-            int last_flags = (last_item.hasScanFlag(ScanFlag.EdgeOfFlightLine)?1:0 << 5) | 
-                             (last_item.hasScanFlag(ScanFlag.ScanDirection)?1:0 << 4) | 
+            int last_flags = ((last_item.hasScanFlag(ScanFlag.EdgeOfFlightLine)?1:0) << 5) |
+                             ((last_item.hasScanFlag(ScanFlag.ScanDirection)?1:0) << 4) |
                              last_item.getClassificationFlags();
             if (contexts[current_context].m_flags[last_flags] == null)
             {
