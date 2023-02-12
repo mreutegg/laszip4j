@@ -572,7 +572,7 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
                 contexts[current_context].m_classification[ccc] = dec_classification.createSymbolModel(256);
                 dec_classification.initSymbolModel(contexts[current_context].m_classification[ccc]);
             }
-            last_item.Classification = (byte)dec_classification.decodeSymbol(contexts[current_context].m_classification[ccc]);
+            last_item.Classification = (short)dec_classification.decodeSymbol(contexts[current_context].m_classification[ccc]);
         }
 
         ////////////////////////////////////////

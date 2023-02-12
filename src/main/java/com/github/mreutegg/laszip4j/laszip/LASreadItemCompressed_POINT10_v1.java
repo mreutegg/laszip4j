@@ -164,7 +164,7 @@ public class LASreadItemCompressed_POINT10_v1 extends LASreadItemCompressed {
                     m_classification[last_item.Classification] = dec.createSymbolModel(256);
                     dec.initSymbolModel(m_classification[last_item.Classification]);
                 }
-                last_item.Classification = (byte) dec.decodeSymbol(m_classification[last_item.Classification]);
+                last_item.Classification = (short) dec.decodeSymbol(m_classification[last_item.Classification]);
             }
 
             // decompress the scan_angle_rank ... if it has changed

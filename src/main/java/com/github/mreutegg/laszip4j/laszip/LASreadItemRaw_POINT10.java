@@ -28,7 +28,7 @@ public class LASreadItemRaw_POINT10 extends LASreadItemRaw {
         result.Z = bb.getInt();
         result.Intensity = bb.getChar();
         result.Flags = bb.get();
-        result.Classification = bb.get();
+        result.Classification = (short)Byte.toUnsignedInt(bb.get());
         result.ScanAngleRank = bb.get();
         result.UserData = (short)Byte.toUnsignedInt(bb.get());
         result.PointSourceID = bb.getChar();
