@@ -10,7 +10,7 @@
  */
 package com.github.mreutegg.laszip4j.laszip;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 public interface MyDefs {
 
@@ -78,11 +78,7 @@ public interface MyDefs {
     }
 
     static byte[] asByteArray(String s) {
-        try {
-            return s.getBytes("US-ASCII");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        return s.getBytes(StandardCharsets.US_ASCII);
     }
 
     static String stringFromByteArray(byte[] bytes) {
@@ -93,14 +89,10 @@ public interface MyDefs {
                 break;
             }
         }
-        try {
-            if (idx != -1) {
-                return new String(bytes, 0, idx, "US-ASCII");
-            } else {
-                return new String(bytes, "US-ASCII");
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+        if (idx != -1) {
+            return new String(bytes, 0, idx, StandardCharsets.US_ASCII);
+        } else {
+            return new String(bytes, StandardCharsets.US_ASCII);
         }
     }
 

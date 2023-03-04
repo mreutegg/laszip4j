@@ -52,8 +52,10 @@ public abstract class ByteStreamOut implements Closeable {
     public abstract boolean putBytes(byte[] bytes, int u_num_bytes);
     /* write 16 bit low-endian field                             */
     public abstract boolean put16bitsLE(char bytes);
+    /* write 16 bit low-endian field                             */
+    public abstract boolean put16bitsLE(short bytes);
     /* write 32 bit low-endian field                             */
-    abstract boolean put32bitsLE(int bytes);
+    public abstract boolean put32bitsLE(int bytes);
     /* write 64 bit low-endian field                             */
     public abstract boolean put64bitsLE(long bytes);
     /* write 16 bit big-endian field                             */

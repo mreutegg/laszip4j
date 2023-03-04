@@ -23,9 +23,9 @@ public class LASreadItemRaw_WAVEPACKET13 extends LASreadItemRaw {
         instream.getBytes(bb.array(), 29);
 
         PointDataRecordWavepacket result = new PointDataRecordWavepacket();
-        result.DescriptorIndex = bb.get();
+        result.DescriptorIndex = (short) Byte.toUnsignedInt(bb.get());
         result.OffsetToWaveformData = bb.getLong();
-        result.PacketSize = bb.getInt();
+        result.PacketSize = Integer.toUnsignedLong(bb.getInt());
         result.ReturnPointWaveformLocation = bb.getFloat();
         result.ParametricDx = bb.getFloat();
         result.ParametricDy = bb.getFloat();

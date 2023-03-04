@@ -19,7 +19,7 @@ public class ByteStreamOutOstream extends ByteStreamOutDataOutput {
 
     private final CountingOutputStream cOut;
 
-    protected ByteStreamOutOstream(OutputStream out) {
+    public ByteStreamOutOstream(OutputStream out) {
         super(null);
         this.cOut = new CountingOutputStream(out);
         this.dataOut = new DataOutputStream(cOut);
