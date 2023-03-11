@@ -259,7 +259,7 @@ public class LASreadItemCompressed_RGB14_v3 extends LASreadItemCompressed{
     dec_RGB.initSymbolModel(contexts[context].m_rgb_diff_5);
 
     /* init current context from item */
-    contexts[context].last_item = seedItem;
+    contexts[context].last_item = new PointDataRecordRGB(seedItem);
 
     contexts[context].unused = false;
 

@@ -209,6 +209,15 @@ class PointDataRecordRGB extends PointDataRecord {
     public char G = 0;
     public char B = 0;
 
+    public PointDataRecordRGB() {
+    }
+
+    public PointDataRecordRGB(PointDataRecordRGB other) {
+        this.R = other.R;
+        this.G = other.G;
+        this.B = other.B;
+    }
+
     public char[] getRGB() {
         return new char[]{(char)R,(char)G,(char)B};
     }
@@ -462,6 +471,15 @@ class PointDataRecordPoint14 extends PointDataRecordXYZBase implements IGpsTimeP
 class PointDataRecordRgbNIR extends PointDataRecordRGB {
 
     public char NIR = 0;
+
+    public PointDataRecordRgbNIR() {
+
+    }
+
+    public PointDataRecordRgbNIR(PointDataRecordRgbNIR other) {
+        super(other);
+        this.NIR = other.NIR;
+    }
 
     @Override
     public String toString()

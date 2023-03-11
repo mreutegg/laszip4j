@@ -848,7 +848,7 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
       
         /* init current context from last item */
       
-        contexts[context].last_item = seedItem;
+        contexts[context].last_item = new PointDataRecordPoint14(seedItem);
         contexts[context].last_item.gps_time_change = false;
             
         contexts[context].unused = false;

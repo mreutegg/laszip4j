@@ -48,7 +48,7 @@ public class LASreadItemCompressed_GPSTIME11_v1 extends LASreadItemCompressed {
         dec.initSymbolModel(m_gpstime_0diff);
         ic_gpstime.initDecompressor();
 
-        last_item = (PointDataRecordGpsTime)seedItem;
+        last_item.GPSTime = ((PointDataRecordGpsTime)seedItem).GPSTime;
     }
 
     @Override

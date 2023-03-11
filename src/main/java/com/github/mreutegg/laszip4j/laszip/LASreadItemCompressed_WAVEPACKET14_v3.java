@@ -231,7 +231,7 @@ public class LASreadItemCompressed_WAVEPACKET14_v3 extends LASreadItemCompressed
 
         contexts[context].last_diff_32 = 0;
         contexts[context].sym_last_offset_diff = 0;
-        contexts[context].last_item = seedItem;
+        contexts[context].last_item = new PointDataRecordWavepacket(seedItem);
 
         contexts[context].unused = false;
 

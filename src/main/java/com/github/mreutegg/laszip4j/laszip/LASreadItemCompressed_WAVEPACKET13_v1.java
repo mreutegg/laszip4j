@@ -63,7 +63,7 @@ public class LASreadItemCompressed_WAVEPACKET13_v1 extends LASreadItemCompressed
         ic_xyz.initDecompressor();
 
         /* init last item */
-        last_item = (PointDataRecordWavepacket)seedItem;
+        last_item = new PointDataRecordWavepacket((PointDataRecordWavepacket)seedItem);
     }
 
     public PointDataRecord read(int notUsed)

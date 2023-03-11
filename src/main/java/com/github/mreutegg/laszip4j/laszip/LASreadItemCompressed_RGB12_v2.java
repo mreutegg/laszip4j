@@ -56,7 +56,7 @@ public class LASreadItemCompressed_RGB12_v2 extends LASreadItemCompressed {
         dec.initSymbolModel(m_rgb_diff_4);
         dec.initSymbolModel(m_rgb_diff_5);
 
-        last_item = (PointDataRecordRGB)seedItem;
+        last_item = new PointDataRecordRGB((PointDataRecordRGB)seedItem);
     }
 
     @Override
