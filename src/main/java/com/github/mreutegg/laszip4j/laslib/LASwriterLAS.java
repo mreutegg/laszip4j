@@ -408,7 +408,8 @@ public class LASwriterLAS extends LASwriter {
 
                 if (evlrs[i].reserved != 0xAABB)
                 {
-                    fprintf(stderr,"WARNING: wrong evlrs[%d].reserved: %d != 0xAABB\n", i, evlrs[i].reserved);
+                    // commented out because las specification 1.4 says this must now be zero
+                    // fprintf(stderr,"WARNING: wrong evlrs[%d].reserved: 0x%04x != 0xAABB\n", i, (int) evlrs[i].reserved);
                 }
 
                 // write variable length records variable after variable (to avoid alignment issues)
@@ -947,7 +948,7 @@ public class LASwriterLAS extends LASwriter {
 
             if (header.vlrs[i].reserved != 0xAABB)
             {
-                // commented out because las specification 1.4 says this mu st now be zero
+                // commented out because las specification 1.4 says this must now be zero
                 // fprintf(stderr,"WARNING: wrong header->vlrs[%d].reserved: 0x%04x != 0xAABB\n", i, (int) header.vlrs[i].reserved);
             }
 
