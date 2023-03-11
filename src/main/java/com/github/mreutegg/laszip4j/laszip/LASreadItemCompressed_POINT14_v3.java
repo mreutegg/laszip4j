@@ -660,11 +660,7 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
             if (gps_time_change) // if the GPS time has actually changed
             {
                 read_gps_time();
-                long x = contexts[current_context].last_gpstime[contexts[current_context].last];
-                if ( x <= 0 )
-                last_item.GPSTime = last_item.GPSTime;
-                else
-                last_item.GPSTime = x;
+                last_item.GPSTime = contexts[current_context].last_gpstime[contexts[current_context].last];
             }
         }
 
@@ -873,7 +869,7 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
           contexts[current_context].next = (contexts[current_context].next+1)&3;
           contexts[current_context].last_gpstime[contexts[current_context].next] = contexts[current_context].ic_gpstime.decompress((int)(contexts[current_context].last_gpstime[contexts[current_context].last] >>> 32), 8);
           contexts[current_context].last_gpstime[contexts[current_context].next] = (contexts[current_context].last_gpstime[contexts[current_context].next] << 32);
-          contexts[current_context].last_gpstime[contexts[current_context].next] |= dec_gps_time.readInt();
+          contexts[current_context].last_gpstime[contexts[current_context].next] |= Integer.toUnsignedLong(dec_gps_time.readInt());
           contexts[current_context].last = contexts[current_context].next;
           contexts[current_context].last_gpstime_diff[contexts[current_context].last] = 0;
           contexts[current_context].multi_extreme_counter[contexts[current_context].last] = 0; 
