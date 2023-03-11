@@ -92,7 +92,7 @@ public class LASreadItemCompressed_POINT10_v2 extends LASreadItemCompressed {
         ic_z.initDecompressor();
 
         /* init last item */
-        last_item = (PointDataRecordPoint10)seedItem;
+        last_item = new PointDataRecordPoint10((PointDataRecordPoint10)seedItem);
 
         /* but set intensity to zero (for the algorith)*/
         last_item.Intensity = 0;

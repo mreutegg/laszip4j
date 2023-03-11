@@ -543,7 +543,7 @@ public class LASwriterLAS extends LASwriter {
             return FALSE;
         }
 
-        file = fopenRAF(file_name.toCharArray(), "wb");
+        file = fopenRAF(file_name.toCharArray(), "rwb");
 
         if (file == null)
         {

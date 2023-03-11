@@ -27,7 +27,7 @@ public class LASquantizer {
     public int get_Y(double y) { if (y >= y_offset) return (int)((y-y_offset)/y_scale_factor+0.5); else return (int)((y-y_offset)/y_scale_factor-0.5); };
     public int get_Z(double z) { if (z >= z_offset) return (int)((z-z_offset)/z_scale_factor+0.5); else return (int)((z-z_offset)/z_scale_factor-0.5); };
 
-    LASquantizer()
+    public LASquantizer()
     {
         x_scale_factor = 0.01;
         y_scale_factor = 0.01;

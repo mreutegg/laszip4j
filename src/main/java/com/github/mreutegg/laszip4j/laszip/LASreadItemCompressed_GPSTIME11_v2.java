@@ -64,7 +64,7 @@ public class LASreadItemCompressed_GPSTIME11_v2 extends LASreadItemCompressed {
         for(int i=0;i<last_item.length;i++)
             last_item[i] = new PointDataRecordGpsTime();
             
-        last_item[last] = (PointDataRecordGpsTime)seedItem;
+        last_item[last].GPSTime = ((PointDataRecordGpsTime)seedItem).GPSTime;
     }
 
     @Override
@@ -87,7 +87,7 @@ public class LASreadItemCompressed_GPSTIME11_v2 extends LASreadItemCompressed {
                 next = (next+1)&3;
                 last_item[next].GPSTime = ic_gpstime.decompress((int)(last_item[last].GPSTime >>> 32), 8);
                 last_item[next].GPSTime = (last_item[next].GPSTime << 32);
-                last_item[next].GPSTime |= dec.readInt();
+                last_item[next].GPSTime |= Integer.toUnsignedLong(dec.readInt());
                 last = next;
                 last_gpstime_diff[last] = 0;
                 multi_extreme_counter[last] = 0;
