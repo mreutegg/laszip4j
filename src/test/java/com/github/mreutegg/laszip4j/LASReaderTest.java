@@ -16,81 +16,40 @@
  */
 package com.github.mreutegg.laszip4j;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
-import java.net.URI;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static com.github.mreutegg.laszip4j.DataFiles.LAS_NUM_POINT_RECORDS;
+import static com.github.mreutegg.laszip4j.DataFiles.LAZ_14_NUM_POINT_RECORDS;
+import static com.github.mreutegg.laszip4j.DataFiles.LAZ_NUM_POINT_RECORDS;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class LASReaderTest {
 
-    private static final String LAZ_NAME = "26690_12570.laz";
-    private static final String LAZ_BASE_URL = "http://maps.zh.ch/download/hoehen/2014/lidar";
-    private static final int LAZ_NUM_POINT_RECORDS = 265401;
-
-    private static final String LAS_NAME = "2312.las";
-    private static final String LAS_BASE_URL = "https://dc-lidar-2018.s3.amazonaws.com/Classified_LAS";
-    private static final int LAS_NUM_POINT_RECORDS = 1653361;
-
-    private static final String LAZ_14_NAME = "autzen-classified.copc.laz";
-    private static final String LAZ_14_BASE_URL = "https://github.com/PDAL/data/raw/master/autzen";
-    private static final int LAZ_14_NUM_POINT_RECORDS = 10653336;
-
-    private final File target = new File("target");
-    private final File laz = new File(target, LAZ_NAME);
-    private final File las = new File(target, LAS_NAME);
-
-    private final File laz14 = new File(target, LAZ_14_NAME);
+    private final DataFiles files = new DataFiles();
 
     @Before
     public void before() throws Exception {
-        if (!laz.exists()) {
-            URI url = new URI(LAZ_BASE_URL + "/" + LAZ_NAME);
-            try (CloseableHttpClient client = HttpClients.createDefault()) {
-                try (CloseableHttpResponse response = client.execute(new HttpGet(url))) {
-                    try (OutputStream out = new FileOutputStream(laz)) {
-                        response.getEntity().writeTo(out);
-                    }
-                }
-            }
-        }
-        if (!las.exists()) {
-            URI url = new URI(LAS_BASE_URL + "/" + LAS_NAME);
-            try (CloseableHttpClient client = HttpClients.createDefault()) {
-                try (CloseableHttpResponse response = client.execute(new HttpGet(url))) {
-                    try (OutputStream out = new FileOutputStream(las)) {
-                        response.getEntity().writeTo(out);
-                    }
-                }
-            }
-        }
-        if (!laz14.exists()) {
-            URI url = new URI(LAZ_14_BASE_URL + "/" + LAZ_14_NAME);
-            try (CloseableHttpClient client = HttpClients.createDefault()) {
-                try (CloseableHttpResponse response = client.execute(new HttpGet(url))) {
-                    try (OutputStream out = new FileOutputStream(laz14)) {
-                        response.getEntity().writeTo(out);
-                    }
-                }
-            }
-        }
+        files.download();
     }
 
     @Test
     public void readLaz14() {
-        LASReader reader = new LASReader(laz14);
+        verifyLaz14(files.laz14);
+    }
+
+    public static void verifyLaz14(File file) {
+        LASReader reader = new LASReader(file);
         LASHeader header = reader.getHeader();
 
         assertEquals(header.getNumberOfVariableLengthRecords(), StreamSupport.stream(header.getVariableLengthRecords().spliterator(), false).count());
@@ -129,7 +88,11 @@ public class LASReaderTest {
 
     @Test
     public void read() {
-        LASReader reader = new LASReader(laz);
+        verifyLaz(files.laz);
+    }
+
+    public static void verifyLaz(File file) {
+        LASReader reader = new LASReader(file);
         LASHeader header = reader.getHeader();
 
         assertEquals(header.getNumberOfVariableLengthRecords(), StreamSupport.stream(header.getVariableLengthRecords().spliterator(), false).count());
@@ -153,7 +116,7 @@ public class LASReaderTest {
 
     @Test
     public void readLAS() {
-        LASReader reader = new LASReader(las);
+        LASReader reader = new LASReader(files.las);
         LASHeader header = reader.getHeader();
 
         long[] classifications = new long[Byte.MAX_VALUE];
@@ -256,7 +219,7 @@ public class LASReaderTest {
     @Test
     public void readLASStream() throws Exception {
         LASHeader header;
-        try (InputStream is = new FileInputStream(las)) {
+        try (InputStream is = Files.newInputStream(files.las.toPath())) {
             header = LASReader.getHeader(is);
         }
 
@@ -319,7 +282,7 @@ public class LASReaderTest {
         double maxGpsTime = Double.MIN_VALUE;
         double minGpsTime = Double.MAX_VALUE;
         long numPoints = 0;
-        try (InputStream is = new FileInputStream(las)) {
+        try (InputStream is = Files.newInputStream(files.las.toPath())) {
             for (LASPoint p : LASReader.getPoints(is)) {
                 classifications[p.getClassification()]++;
                 minX = Math.min(minX, p.getX());
@@ -361,7 +324,7 @@ public class LASReaderTest {
 
     @Test
     public void insideTile() {
-        LASReader reader = new LASReader(laz)
+        LASReader reader = new LASReader(files.laz)
                 .insideTile(2669450, 1257400, 40);
 
         int minX = Integer.MAX_VALUE;
@@ -389,7 +352,7 @@ public class LASReaderTest {
 
     @Test
     public void insideRectangle() {
-        LASReader reader = new LASReader(laz)
+        LASReader reader = new LASReader(files.laz)
                 .insideRectangle(2669450, 1257390, 2669480, 1257450);
 
         int minX = Integer.MAX_VALUE;
@@ -417,7 +380,7 @@ public class LASReaderTest {
 
     @Test
     public void insideCircle() {
-        LASReader reader = new LASReader(laz)
+        LASReader reader = new LASReader(files.laz)
                 .insideCircle(2669465, 1257440, 20);
 
         int minX = Integer.MAX_VALUE;

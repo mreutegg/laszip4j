@@ -12,6 +12,8 @@ package com.github.mreutegg.laszip4j.laslib;
 
 public class LASvlr_lasoriginal {
 
+    public long position;
+
     public long number_of_point_records;
     public long[] number_of_points_by_return = new long[15];
     public double max_x;

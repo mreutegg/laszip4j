@@ -352,7 +352,7 @@ public class LASzip {
         return true;
     }
 
-    boolean setup(char num_items, LASitem[] items, char compressor)
+    public boolean setup(char num_items, LASitem[] items, char compressor)
     {
         // check input
         if (!check_compressor(compressor)) return false;
@@ -577,7 +577,7 @@ public class LASzip {
         return true;
     }
 
-    boolean set_chunk_size(int u_chunk_size)
+    public boolean set_chunk_size(int u_chunk_size)
     {
         if (num_items == 0) return return_error("call setup() before setting chunk size");
         if (this.compressor == LASZIP_COMPRESSOR_POINTWISE_CHUNKED)
@@ -588,7 +588,7 @@ public class LASzip {
         return false;
     }
 
-    boolean request_version(char requested_version)
+    public boolean request_version(char requested_version)
     {
         if (num_items == 0) return return_error("call setup() before requesting version");
         if (compressor == LASZIP_COMPRESSOR_NONE)
@@ -625,7 +625,7 @@ public class LASzip {
         return true;
     }
 
-    boolean is_standard(byte[] point_type, char[] record_length)
+    public boolean is_standard(byte[] point_type, char[] record_length)
     {
         return is_standard(num_items, items, point_type, record_length);
     }

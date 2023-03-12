@@ -15,7 +15,7 @@ import com.github.mreutegg.laszip4j.laszip.LASquantizer;
 
 public abstract class LASwriter {
 
-    public LASquantizer quantizer;
+    public LASquantizer quantizer = new LASquantizer();
     public long npoints;
     public long p_count;
     public LASinventory inventory;

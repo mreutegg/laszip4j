@@ -77,7 +77,7 @@ public class LASreadItemCompressed_POINT10_v1 extends LASreadItemCompressed {
             if (m_user_data[i] != null) dec.initSymbolModel(m_user_data[i]);
         }
 
-        last_item = (PointDataRecordPoint10)seedItem;
+        last_item = new PointDataRecordPoint10((PointDataRecordPoint10)seedItem);
     }
 
     @Override

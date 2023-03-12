@@ -609,7 +609,7 @@ public class Laszip {
                                     if ( null != laswriter)
                                         laswriter.write_point(lasreader.point);
                                     
-                                    System.out.println(lasreader.point.get_x()+" "+lasreader.point.get_y()+" ="+lasreader.point.get_z()+" "+lasreader.point.getIntensity()+" "+lasreader.point.getClassification());
+                                    // System.out.println(lasreader.point.get_x()+" "+lasreader.point.get_y()+" ="+lasreader.point.get_z()+" "+lasreader.point.getIntensity()+" "+lasreader.point.getClassification());
                                 }
                             }
                             if ( null != laswriter)

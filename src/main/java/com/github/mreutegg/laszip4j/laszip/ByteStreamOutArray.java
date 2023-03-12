@@ -87,6 +87,14 @@ public class ByteStreamOutArray extends ByteStreamOut {
     }
 
     @Override
+    public boolean put16bitsLE(short bytes) {
+        ensureCapacity(2);
+        data.putShort(bytes);
+        updateSize();
+        return true;
+    }
+
+    @Override
     public boolean put32bitsLE(int bytes) {
         ensureCapacity(4);
         data.putInt(bytes);

@@ -376,7 +376,7 @@ public class LASreadItemCompressed_RGBNIR14_v3 extends LASreadItemCompressed{
 
         /* init current context from item */
 
-        contexts[context].last_item = seedItem;    
+        contexts[context].last_item = new PointDataRecordRgbNIR(seedItem);
         contexts[context].unused = false;
 
         return true;

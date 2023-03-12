@@ -58,8 +58,13 @@ abstract class ByteStreamOutDataOutput extends ByteStreamOut {
         return putBytes(buffer.array(), 2);
     }
 
+    public boolean put16bitsLE(short bytes) {
+        bufferLE().putShort(bytes);
+        return putBytes(buffer.array(), 2);
+    }
+
     @Override
-    boolean put32bitsLE(int bytes) {
+    public boolean put32bitsLE(int bytes) {
         bufferLE().putInt(bytes);
         return putBytes(buffer.array(), 4);
     }

@@ -41,6 +41,10 @@ public class IntegerCompressor {
         this(enc, u_bits, 1, 8, 0);
     }
 
+    public IntegerCompressor(ArithmeticEncoder enc, int u_bits, int u_contexts) {
+        this(enc, u_bits, u_contexts, 8, 0);
+    }
+
     IntegerCompressor(ArithmeticEncoder enc, int u_bits, int u_contexts, int u_bits_high, int u_range)
     {
         assert(enc != null);
