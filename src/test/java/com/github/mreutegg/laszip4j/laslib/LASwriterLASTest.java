@@ -30,6 +30,8 @@ public class LASwriterLASTest {
 
     private final File las = new File("target", files.laz.getName() + LASwriterLASTest.class.getName() + ".las");
 
+    private final File las14 = new File("target", files.laz14.getName() + LASwriterLASTest.class.getName() + ".las");
+
     @Before
     public void before() throws Exception {
         files.download();
@@ -39,5 +41,11 @@ public class LASwriterLASTest {
     public void writeLas() {
         Laszip.run(new String[]{"-i", files.laz.getPath(), "-o", las.getPath()});
         LASReaderTest.verifyLaz(las);
+    }
+
+    @Test
+    public void writeLas14() {
+        Laszip.run(new String[]{"-i", files.laz14.getPath(), "-o", las14.getPath()});
+        LASReaderTest.verifyLaz14(las14);
     }
 }

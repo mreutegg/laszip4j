@@ -45,7 +45,11 @@ public class LASReaderTest {
 
     @Test
     public void readLaz14() {
-        LASReader reader = new LASReader(files.laz14);
+        verifyLaz14(files.laz14);
+    }
+
+    public static void verifyLaz14(File file) {
+        LASReader reader = new LASReader(file);
         LASHeader header = reader.getHeader();
 
         assertEquals(header.getNumberOfVariableLengthRecords(), StreamSupport.stream(header.getVariableLengthRecords().spliterator(), false).count());
