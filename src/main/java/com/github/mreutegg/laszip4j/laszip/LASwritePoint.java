@@ -377,6 +377,7 @@ public class LASwritePoint {
                 writers_compressed[i].init(pointRecords[i], context);
             }
             writers = writers_compressed;
+            assert(enc != null);
             enc.init(outstream);
         }
         return TRUE;
