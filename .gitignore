@@ -3,6 +3,7 @@ target
 *.iws
 *.iml
 .shelf
+/.idea/
 
 .vscode/*
 !.vscode/settings.json
