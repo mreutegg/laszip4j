@@ -35,3 +35,5 @@ case the executable jar file can be used to read compressed data from a laz
 file and write it to a corresponding las file.
 
     java -jar laszip4j-0.13.jar -i 7015_2640.laz -o 7015_2640.las
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/mreutegg)
