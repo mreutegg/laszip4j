@@ -19,23 +19,19 @@ package com.github.mreutegg.laszip4j.laslib;
 import com.github.mreutegg.laszip4j.DataFiles;
 import com.github.mreutegg.laszip4j.LASReaderTest;
 import com.github.mreutegg.laszip4j.lastools.Laszip;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
 
 public class LASwriterLASTest {
 
-    private final DataFiles files = new DataFiles();
+    @Rule
+    public final DataFiles files = new DataFiles();
 
-    private final File las = new File("target", files.laz.getName() + LASwriterLASTest.class.getName() + ".las");
+    private final File las = new File("target", files.laz.getName() + LASwriterLASTest.class.getSimpleName() + ".las");
 
-    private final File las14 = new File("target", files.laz14.getName() + LASwriterLASTest.class.getName() + ".las");
-
-    @Before
-    public void before() throws Exception {
-        files.download();
-    }
+    private final File las14 = new File("target", files.laz14.getName() + LASwriterLASTest.class.getSimpleName() + ".las");
 
     @Test
     public void writeLas() {

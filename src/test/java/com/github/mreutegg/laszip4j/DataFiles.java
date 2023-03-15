@@ -20,13 +20,14 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.junit.rules.ExternalResource;
 
 import java.io.File;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Files;
 
-public class DataFiles {
+public class DataFiles extends ExternalResource {
 
     public static final String LAZ_NAME = "26690_12570.laz";
     private static final String LAZ_BASE_URL = "http://maps.zh.ch/download/hoehen/2014/lidar";
@@ -44,6 +45,11 @@ public class DataFiles {
     public final File laz = new File(target, LAZ_NAME);
     public final File las = new File(target, LAS_NAME);
     public final File laz14 = new File(target, LAZ_14_NAME);
+
+    @Override
+    protected void before() throws Throwable {
+        download();
+    }
 
     public void download() throws Exception {
         if (!laz.exists()) {

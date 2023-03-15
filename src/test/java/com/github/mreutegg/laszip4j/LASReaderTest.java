@@ -16,7 +16,7 @@
  */
 package com.github.mreutegg.laszip4j;
 
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
@@ -36,12 +36,8 @@ import static org.junit.Assert.assertTrue;
 
 public class LASReaderTest {
 
-    private final DataFiles files = new DataFiles();
-
-    @Before
-    public void before() throws Exception {
-        files.download();
-    }
+    @Rule
+    public final DataFiles files = new DataFiles();
 
     @Test
     public void readLaz14() {
