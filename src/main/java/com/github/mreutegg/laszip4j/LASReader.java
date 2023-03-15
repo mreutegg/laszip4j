@@ -19,6 +19,7 @@ package com.github.mreutegg.laszip4j;
 import com.github.mreutegg.laszip4j.laslib.LASreadOpener;
 import com.github.mreutegg.laszip4j.laslib.LASreader;
 import com.github.mreutegg.laszip4j.laslib.LASreaderLAS;
+import com.github.mreutegg.laszip4j.laslib.LAStransform;
 import com.github.mreutegg.laszip4j.laszip.LASpoint;
 
 import static com.github.mreutegg.laszip4j.laszip.LASzip.LASZIP_DECOMPRESS_SELECTIVE_ALL;
@@ -39,6 +40,8 @@ public final class LASReader {
     private final InputStream is;
 
     private Constraint constraint = new None();
+
+    private LASPointTransformer transform = LASPointTransformer.NONE;
 
     /**
      * Constructs a new reader for the given file. The file may refer to a raw
@@ -92,6 +95,17 @@ public final class LASReader {
     }
 
     /**
+     * Apply a transformation to points read by this reader.
+     *
+     * @param transformer the transformer.
+     * @return this reader.
+     */
+    public LASReader transform(LASPointTransformer transformer) {
+        this.transform = requireNonNull(transformer);
+        return this;
+    }
+
+    /**
      * @return the LAS points.
      */
     public Iterable<LASPoint> getPoints() {
@@ -131,7 +145,7 @@ public final class LASReader {
 
     //--------------------------------< internal >-----------------------------
 
-    private LASreader openReader() {
+    LASreader openReader() {
         LASreader reader;
         if (file != null) {
             if (!file.exists() || !file.isFile()) {
@@ -148,6 +162,9 @@ public final class LASReader {
             }
         }
         constraint.apply(reader);
+        if (transform != LASPointTransformer.NONE) {
+            reader.set_transform(new CustomLAStransform(transform));
+        }
         return reader;
     }
 
@@ -200,6 +217,34 @@ public final class LASReader {
         @Override
         public boolean apply(LASreader reader) {
             return reader.inside_none();
+        }
+    }
+
+    private static final class CustomLAStransform extends LAStransform {
+
+        private final LASPointTransformer transformer;
+
+        private CustomLAStransform(LASPointTransformer transformer) {
+            this.transformer = transformer;
+        }
+
+        @Override
+        public void transform(LASpoint point) {
+            transformer.transform(new LASPoint(point), new PointModifier(point));
+        }
+    }
+
+    private static final class PointModifier implements LASPointModifier {
+
+        private final LASpoint point;
+
+        public PointModifier(LASpoint point) {
+            this.point = point;
+        }
+
+        @Override
+        public void setClassification(short classification) {
+            point.setClassification(classification);
         }
     }
 }
