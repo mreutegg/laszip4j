@@ -37,7 +37,7 @@ public class LASreadItemCompressed_BYTE_v1 extends LASreadItemCompressed {
         ic_byte.initDecompressor();
 
         /* init last item */
-        last_item = (PointDataRecordBytes)seedItem;
+        last_item = new PointDataRecordBytes((PointDataRecordBytes) seedItem);
     }
 
     @Override	
