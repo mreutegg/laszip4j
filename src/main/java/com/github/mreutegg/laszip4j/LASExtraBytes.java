@@ -1,0 +1,109 @@
+/*
+ * Copyright 2023 Marcel Reutegger
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.github.mreutegg.laszip4j;
+
+import com.github.mreutegg.laszip4j.laszip.LASpoint;
+
+import java.math.BigInteger;
+
+public final class LASExtraBytes {
+
+    private final LASpoint point;
+
+    private final LASExtraBytesDescription description;
+
+    LASExtraBytes(LASpoint point,
+                  LASExtraBytesDescription description) {
+        this.point = point;
+        this.description = description;
+    }
+
+    public Double getValue() {
+        Number v = getRawValue();
+        LASExtraBytesType t = description.getDataType();
+        return translateRawToDouble(v, t, 0);
+    }
+
+    public Double[] getValues() {
+        Number[] raws = getRawValues();
+        Double[] values = new Double[raws.length];
+        LASExtraBytesType t = description.getDataType();
+        for (int i = 0; i < raws.length; i++) {
+            values[i] = translateRawToDouble(values[i], t, i);
+        }
+        return values;
+    }
+
+    private Double translateRawToDouble(Number v,
+                                        LASExtraBytesType t,
+                                        int i) {
+        if (t.isUnsigned()) {
+            Class<?> type = t.getClazz();
+            if (type == Byte.class) {
+                v = Byte.toUnsignedInt(v.byteValue());
+            } else if (type == Short.class) {
+                v = Short.toUnsignedInt(v.shortValue());
+            } else if (type == Integer.class) {
+                v = Integer.toUnsignedLong(v.intValue());
+            } else if (type == Long.class) {
+                v = new BigInteger(Long.toUnsignedString(v.longValue()));
+            }
+        }
+        if (description.hasScaleValue()) {
+            v = v.doubleValue() * description.getScale(i);
+        }
+        if (description.hasOffsetValue()) {
+            v = v.doubleValue() + description.getOffset(i);
+        }
+        return v.doubleValue();
+    }
+
+    public Number getRawValue() {
+        Class<?> type = description.getDataType().getClazz();
+        int start = description.getStart();
+        return getRawValue(type, start);
+    }
+
+    public Number[] getRawValues() {
+        LASExtraBytesType t = description.getDataType();
+        Number[] values = new Number[t.getLength()];
+        int offset = description.getStart();
+        for (int i = 0; i < values.length; i++) {
+            values[i] = getRawValue(t.getClazz(), offset);
+            offset += description.getTypeSize();
+        }
+        return values;
+    }
+
+    private Number getRawValue(Class<?> type, int offset) {
+        if (type == Byte.class) {
+            return point.get_attributeByte(offset);
+        } else if (type == Short.class) {
+            return point.get_attributeShort(offset);
+        } else if (type == Integer.class) {
+            return point.get_attributeInt(offset);
+        } else if (type == Long.class) {
+            return point.get_attributeLong(offset);
+        } else if (type == Float.class) {
+            return point.get_attributeFloat(offset);
+        } else if (type == Double.class) {
+            return point.get_attributeDouble(offset);
+        } else {
+            throw new IllegalStateException("Unsupported type: " + type.getName());
+        }
+    }
+}
