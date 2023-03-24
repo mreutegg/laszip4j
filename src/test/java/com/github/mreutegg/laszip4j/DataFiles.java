@@ -41,10 +41,16 @@ public class DataFiles extends ExternalResource {
     private static final String LAZ_14_BASE_URL = "https://github.com/PDAL/data/raw/master/autzen";
     public static final int LAZ_14_NUM_POINT_RECORDS = 10653336;
 
+    // file created with txt2las as described here: https://groups.google.com/g/lasroom/c/DWQ2GXKE8f8
+    public static final String EXTRA_TYPES_NAME = "extra-bytes.las";
+
     private final File target = new File("target");
+    private final File resources = new File(new File("src", "test"), "resources");
+
     public final File laz = new File(target, LAZ_NAME);
     public final File las = new File(target, LAS_NAME);
     public final File laz14 = new File(target, LAZ_14_NAME);
+    public final File extraBytes = new File(resources, EXTRA_TYPES_NAME);
 
     @Override
     protected void before() throws Throwable {

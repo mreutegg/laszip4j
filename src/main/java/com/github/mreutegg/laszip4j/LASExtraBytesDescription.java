@@ -22,59 +22,106 @@ import com.github.mreutegg.laszip4j.laszip.MyDefs;
 import static com.github.mreutegg.laszip4j.LASExtraBytesType.fromOrdinal;
 import static java.util.Objects.requireNonNull;
 
+/**
+ * A description of extra bytes appended to point data.
+ */
 public final class LASExtraBytesDescription {
-
 
     private final LASattribute attribute;
 
-    private final int start;
+    /**
+     * The byte offset for the described extra bytes.
+     */
+    private final int offset;
 
-    public LASExtraBytesDescription(LASattribute attribute,
-                                    int start) {
+    /**
+     * Create a new extra bytes description starting at the given offset.
+     *
+     * @param attribute the underlying attribute.
+     * @param offset byte offsite within extra bytes.
+     */
+    LASExtraBytesDescription(LASattribute attribute,
+                             int offset) {
         this.attribute = requireNonNull(attribute);
-        this.start = start;
+        this.offset = offset;
     }
 
-    int getStart() {
-        return start;
+    /**
+     * @return byte offset for the described extra bytes.
+     */
+    int getOffset() {
+        return offset;
     }
 
+    /**
+     * Size in bytes of described type.
+     * @return size in bytes.
+     */
     int getTypeSize() {
         return attribute.get_size();
     }
 
+    /**
+     * @return the data byte for the described extra bytes.
+     */
     public LASExtraBytesType getDataType() {
         return fromOrdinal(attribute.data_type);
     }
 
+    /**
+     * @return the name for the described extra bytes.
+     */
     public String getName() {
         return MyDefs.stringFromByteArray(attribute.name);
     }
 
+    /**
+     * @return the description for the described extra bytes.
+     */
     public String getDescription() {
         return MyDefs.stringFromByteArray(attribute.description);
     }
 
+    /**
+     * @return whether the described extra bytes has a no-data value.
+     */
     public boolean hasNoDataValue() {
         return attribute.has_no_data();
     }
 
+    /**
+     * @return whether the described extra bytes has a min value.
+     */
     public boolean hasMinValue() {
         return attribute.has_min();
     }
 
+    /**
+     * @return whether the described extra bytes has a max value.
+     */
     public boolean hasMaxValue() {
         return attribute.has_max();
     }
 
+    /**
+     * @return whether the described extra bytes has a scale value.
+     */
     public boolean hasScaleValue() {
         return attribute.has_scale();
     }
 
+    /**
+     * @return whether the described extra bytes has an offset value.
+     */
     public boolean hasOffsetValue() {
         return attribute.has_offset();
     }
 
+    /**
+     * Returns the scale value for a given index.
+     * @param i index
+     * @return the scale value for a given index.
+     */
     public double getScale(int i) {
         if (i < 0 || i >= attribute.scale.length) {
             throw new IllegalStateException("" + i);
@@ -82,6 +129,11 @@ public final class LASExtraBytesDescription {
         return attribute.scale[i];
     }
 
+    /**
+     * Returns the offset value for a given index.
+     * @param i index
+     * @return the offset value for a given index.
+     */
     public double getOffset(int i) {
         if (i < 0 || i >= attribute.offset.length) {
             throw new IllegalStateException("" + i);

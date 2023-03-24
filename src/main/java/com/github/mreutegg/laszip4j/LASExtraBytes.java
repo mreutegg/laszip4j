@@ -20,6 +20,9 @@ import com.github.mreutegg.laszip4j.laszip.LASpoint;
 
 import java.math.BigInteger;
 
+/**
+ * Represents some extra bytes as described in the VLR LASF_Spec/4.
+ */
 public final class LASExtraBytes {
 
     private final LASpoint point;
@@ -32,18 +35,30 @@ public final class LASExtraBytes {
         this.description = description;
     }
 
+    /**
+     * @return the value of the described extra bytes as a double after applying
+     *          a potential offset and scale operation.
+     */
     public Double getValue() {
         Number v = getRawValue();
         LASExtraBytesType t = description.getDataType();
         return translateRawToDouble(v, t, 0);
     }
 
+    /**
+     * Returns all values of the described extra bytes in an array. The length
+     * of the array is determined by the type of the extra bytes.
+     * See {@link LASExtraBytesType#getLength()}
+     *
+     * @return the values of the described extra bytes as an array of double
+     *          after applying a potential offset and scale operation.
+     */
     public Double[] getValues() {
         Number[] raws = getRawValues();
         Double[] values = new Double[raws.length];
         LASExtraBytesType t = description.getDataType();
         for (int i = 0; i < raws.length; i++) {
-            values[i] = translateRawToDouble(values[i], t, i);
+            values[i] = translateRawToDouble(raws[i], t, i);
         }
         return values;
     }
@@ -72,16 +87,22 @@ public final class LASExtraBytes {
         return v.doubleValue();
     }
 
+    /**
+     * @return the raw value as stored in the described extra bytes.
+     */
     public Number getRawValue() {
         Class<?> type = description.getDataType().getClazz();
-        int start = description.getStart();
+        int start = description.getOffset();
         return getRawValue(type, start);
     }
 
+    /**
+     * @return the raw values as stored in the described extra bytes.
+     */
     public Number[] getRawValues() {
         LASExtraBytesType t = description.getDataType();
         Number[] values = new Number[t.getLength()];
-        int offset = description.getStart();
+        int offset = description.getOffset();
         for (int i = 0; i < values.length; i++) {
             values[i] = getRawValue(t.getClazz(), offset);
             offset += description.getTypeSize();
