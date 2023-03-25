@@ -409,6 +409,11 @@ public class LASReaderTest {
 
         LASExtraBytesDescription phi = header.getExtraBytesDescription("phi");
         assertNotNull(phi);
+        assertTrue(phi.hasScaleValue());
+        assertFalse(phi.hasOffsetValue());
+        assertFalse(phi.hasNoDataValue());
+        assertFalse(phi.hasMinValue());
+        assertFalse(phi.hasMaxValue());
         assertEquals(1, phi.getType().getCardinality());
         assertEquals(4, phi.getType().getDataType());
         assertFalse(phi.getType().isUnsigned());
@@ -416,6 +421,11 @@ public class LASReaderTest {
 
         LASExtraBytesDescription range = header.getExtraBytesDescription("range");
         assertNotNull(range);
+        assertFalse(range.hasScaleValue());
+        assertFalse(range.hasOffsetValue());
+        assertFalse(range.hasNoDataValue());
+        assertFalse(range.hasMinValue());
+        assertFalse(range.hasMaxValue());
         assertEquals(1, range.getType().getCardinality());
         assertEquals(5, range.getType().getDataType());
         assertTrue(range.getType().isUnsigned());
