@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -32,6 +33,9 @@ import static com.github.mreutegg.laszip4j.DataFiles.LAZ_14_NUM_POINT_RECORDS;
 import static com.github.mreutegg.laszip4j.DataFiles.LAZ_NUM_POINT_RECORDS;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class LASReaderTest {
@@ -396,5 +400,72 @@ public class LASReaderTest {
         assertEquals(266948497, maxX);
         assertEquals(125742060, minY);
         assertEquals(125745999, maxY);
+    }
+
+    @Test
+    public void readExtraBytesUnknown() {
+        LASReader reader = new LASReader(files.extraBytes);
+        LASHeader header = reader.getHeader();
+        LASExtraBytesDescription unknown = header.getExtraBytesDescription("unknown");
+        assertNull(unknown);
+    }
+
+    @Test
+    public void readExtraBytesShort() {
+        LASReader reader = new LASReader(files.extraBytes);
+        LASHeader header = reader.getHeader();
+
+        LASExtraBytesDescription phi = header.getExtraBytesDescription("phi");
+        assertNotNull(phi);
+        assertTrue(phi.hasScaleValue());
+        assertFalse(phi.hasOffsetValue());
+        assertFalse(phi.hasNoDataValue());
+        assertFalse(phi.hasMinValue());
+        assertFalse(phi.hasMaxValue());
+        assertEquals(1, phi.getType().getCardinality());
+        assertEquals(4, phi.getType().getDataType());
+        assertFalse(phi.getType().isUnsigned());
+        assertEquals(Short.class, phi.getType().getClazz());
+
+        List<String> values = new ArrayList<>();
+        for (LASPoint p : reader.getPoints()) {
+            LASExtraBytes value = p.getExtraBytes(phi);
+            values.add(String.format("%.2f", value.getValue()));
+        }
+        assertEquals(Arrays.asList("0.80", "1.12", "1.00", "1.28", "1.52"), values);
+    }
+
+    @Test
+    public void readExtraBytesInteger() {
+        LASReader reader = new LASReader(files.extraBytes);
+        LASHeader header = reader.getHeader();
+
+        LASExtraBytesDescription range = header.getExtraBytesDescription("range");
+        assertNotNull(range);
+        assertFalse(range.hasScaleValue());
+        assertFalse(range.hasOffsetValue());
+        assertFalse(range.hasNoDataValue());
+        assertFalse(range.hasMinValue());
+        assertFalse(range.hasMaxValue());
+        assertEquals(1, range.getType().getCardinality());
+        assertEquals(5, range.getType().getDataType());
+        assertTrue(range.getType().isUnsigned());
+        assertEquals(Integer.class, range.getType().getClazz());
+
+        List<String> values = new ArrayList<>();
+        for (LASPoint p : reader.getPoints()) {
+            LASExtraBytes value = p.getExtraBytes(range);
+            values.add(String.format("%.0f", value.getValue()));
+            assertEquals(1, value.getValues().length);
+            assertEquals(value.getValue(), value.getValues()[0], 0.0);
+        }
+        assertEquals(Arrays.asList("23905", "23907", "23912", "23903", "23904"), values);
+
+        values.clear();
+        for (LASPoint p : reader.getPoints()) {
+            LASExtraBytes value = p.getExtraBytes(range);
+            values.add(String.format("%d", value.getRawValue().longValue()));
+        }
+        assertEquals(Arrays.asList("23905", "23907", "23912", "23903", "23904"), values);
     }
 }

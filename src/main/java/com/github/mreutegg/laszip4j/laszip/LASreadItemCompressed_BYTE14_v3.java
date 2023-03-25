@@ -262,7 +262,7 @@ public class LASreadItemCompressed_BYTE14_v3 extends LASreadItemCompressed{
           }
         }
       
-        contexts[context].last_item = seedItem;
+        contexts[context].last_item = new PointDataRecordBytes(seedItem);
 
         /* then init entropy models */      
         for (i = 0; i < number; i++)

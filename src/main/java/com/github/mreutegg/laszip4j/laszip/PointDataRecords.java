@@ -494,6 +494,10 @@ class PointDataRecordBytes extends PointDataRecord {
         Bytes = new byte[byteCount];
     }
 
+    public PointDataRecordBytes(PointDataRecordBytes other) {
+        this.Bytes = new byte[other.Bytes.length];
+        System.arraycopy(other.Bytes, 0, this.Bytes, 0, other.Bytes.length);
+    }
     public byte[] Bytes;
 
     @Override

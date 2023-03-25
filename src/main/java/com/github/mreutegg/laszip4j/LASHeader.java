@@ -316,4 +316,24 @@ public final class LASHeader {
         }
         return records.subList(0, getNumberOfExtendedVariableLengthRecords());
     }
+
+    public Iterable<LASExtraBytesDescription> getExtraBytesDescriptions() {
+        List<LASExtraBytesDescription> descriptions = new ArrayList<>();
+        for (int i = 0; i < header.attributes.size(); i++) {
+            descriptions.add(new LASExtraBytesDescription(
+                    header.attributes.get(i),
+                    header.attribute_starts.get(i)
+            ));
+        }
+        return descriptions;
+    }
+
+    public LASExtraBytesDescription getExtraBytesDescription(String name) {
+        for (LASExtraBytesDescription d : getExtraBytesDescriptions()) {
+            if (d.getName().equals(name)) {
+                return d;
+            }
+        }
+        return null;
+    }
 }

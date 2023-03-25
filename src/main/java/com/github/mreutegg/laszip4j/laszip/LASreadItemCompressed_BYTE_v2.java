@@ -50,7 +50,7 @@ public class LASreadItemCompressed_BYTE_v2 extends LASreadItemCompressed {
             dec.initSymbolModel(m_byte[i]);
         }
 
-        last_item = (PointDataRecordBytes)seedItem;
+        last_item = new PointDataRecordBytes((PointDataRecordBytes) seedItem);
     }
 
     @Override	

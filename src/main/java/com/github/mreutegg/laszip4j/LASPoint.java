@@ -210,4 +210,8 @@ public final class LASPoint {
      * @return "Z(t)" as a float.
      */
     public float getZt() { return p.getWavepacketParametricDz(); }
+
+    public LASExtraBytes getExtraBytes(LASExtraBytesDescription description) {
+        return new LASExtraBytes(p, description);
+    }
 }
