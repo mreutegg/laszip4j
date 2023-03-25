@@ -33,6 +33,7 @@ import static com.github.mreutegg.laszip4j.DataFiles.LAZ_14_NUM_POINT_RECORDS;
 import static com.github.mreutegg.laszip4j.DataFiles.LAZ_NUM_POINT_RECORDS;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -405,10 +406,21 @@ public class LASReaderTest {
     public void readExtraBytes() {
         LASReader reader = new LASReader(files.extraBytes);
         LASHeader header = reader.getHeader();
+
         LASExtraBytesDescription phi = header.getExtraBytesDescription("phi");
         assertNotNull(phi);
+        assertEquals(1, phi.getType().getCardinality());
+        assertEquals(4, phi.getType().getDataType());
+        assertFalse(phi.getType().isUnsigned());
+        assertEquals(Short.class, phi.getType().getClazz());
+
         LASExtraBytesDescription range = header.getExtraBytesDescription("range");
         assertNotNull(range);
+        assertEquals(1, range.getType().getCardinality());
+        assertEquals(5, range.getType().getDataType());
+        assertTrue(range.getType().isUnsigned());
+        assertEquals(Integer.class, range.getType().getClazz());
+
         LASExtraBytesDescription unknown = header.getExtraBytesDescription("unknown");
         assertNull(unknown);
 

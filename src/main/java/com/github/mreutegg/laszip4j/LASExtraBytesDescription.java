@@ -62,9 +62,9 @@ public final class LASExtraBytesDescription {
     }
 
     /**
-     * @return the data byte for the described extra bytes.
+     * @return the type for the described extra bytes.
      */
-    public LASExtraBytesType getDataType() {
+    public LASExtraBytesType getType() {
         return fromOrdinal(attribute.data_type);
     }
 

@@ -41,14 +41,14 @@ public final class LASExtraBytes {
      */
     public Double getValue() {
         Number v = getRawValue();
-        LASExtraBytesType t = description.getDataType();
+        LASExtraBytesType t = description.getType();
         return translateRawToDouble(v, t, 0);
     }
 
     /**
      * Returns all values of the described extra bytes in an array. The length
-     * of the array is determined by the type of the extra bytes.
-     * See {@link LASExtraBytesType#getLength()}
+     * of the array is determined by the cardinality of the type.
+     * See {@link LASExtraBytesType#getCardinality()}
      *
      * @return the values of the described extra bytes as an array of double
      *          after applying a potential offset and scale operation.
@@ -56,7 +56,7 @@ public final class LASExtraBytes {
     public Double[] getValues() {
         Number[] raws = getRawValues();
         Double[] values = new Double[raws.length];
-        LASExtraBytesType t = description.getDataType();
+        LASExtraBytesType t = description.getType();
         for (int i = 0; i < raws.length; i++) {
             values[i] = translateRawToDouble(raws[i], t, i);
         }
@@ -91,7 +91,7 @@ public final class LASExtraBytes {
      * @return the raw value as stored in the described extra bytes.
      */
     public Number getRawValue() {
-        Class<?> type = description.getDataType().getClazz();
+        Class<?> type = description.getType().getClazz();
         int start = description.getOffset();
         return getRawValue(type, start);
     }
@@ -100,8 +100,8 @@ public final class LASExtraBytes {
      * @return the raw values as stored in the described extra bytes.
      */
     public Number[] getRawValues() {
-        LASExtraBytesType t = description.getDataType();
-        Number[] values = new Number[t.getLength()];
+        LASExtraBytesType t = description.getType();
+        Number[] values = new Number[t.getCardinality()];
         int offset = description.getOffset();
         for (int i = 0; i < values.length; i++) {
             values[i] = getRawValue(t.getClazz(), offset);
