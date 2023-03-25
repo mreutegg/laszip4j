@@ -403,7 +403,15 @@ public class LASReaderTest {
     }
 
     @Test
-    public void readExtraBytes() {
+    public void readExtraBytesUnknown() {
+        LASReader reader = new LASReader(files.extraBytes);
+        LASHeader header = reader.getHeader();
+        LASExtraBytesDescription unknown = header.getExtraBytesDescription("unknown");
+        assertNull(unknown);
+    }
+
+    @Test
+    public void readExtraBytesShort() {
         LASReader reader = new LASReader(files.extraBytes);
         LASHeader header = reader.getHeader();
 
@@ -419,6 +427,19 @@ public class LASReaderTest {
         assertFalse(phi.getType().isUnsigned());
         assertEquals(Short.class, phi.getType().getClazz());
 
+        List<String> values = new ArrayList<>();
+        for (LASPoint p : reader.getPoints()) {
+            LASExtraBytes value = p.getExtraBytes(phi);
+            values.add(String.format("%.2f", value.getValue()));
+        }
+        assertEquals(Arrays.asList("0.80", "1.12", "1.00", "1.28", "1.52"), values);
+    }
+
+    @Test
+    public void readExtraBytesInteger() {
+        LASReader reader = new LASReader(files.extraBytes);
+        LASHeader header = reader.getHeader();
+
         LASExtraBytesDescription range = header.getExtraBytesDescription("range");
         assertNotNull(range);
         assertFalse(range.hasScaleValue());
@@ -431,17 +452,7 @@ public class LASReaderTest {
         assertTrue(range.getType().isUnsigned());
         assertEquals(Integer.class, range.getType().getClazz());
 
-        LASExtraBytesDescription unknown = header.getExtraBytesDescription("unknown");
-        assertNull(unknown);
-
         List<String> values = new ArrayList<>();
-        for (LASPoint p : reader.getPoints()) {
-            LASExtraBytes value = p.getExtraBytes(phi);
-            values.add(String.format("%.2f", value.getValue()));
-        }
-        assertEquals(Arrays.asList("0.80", "1.12", "1.00", "1.28", "1.52"), values);
-
-        values.clear();
         for (LASPoint p : reader.getPoints()) {
             LASExtraBytes value = p.getExtraBytes(range);
             values.add(String.format("%.0f", value.getValue()));
@@ -457,5 +468,4 @@ public class LASReaderTest {
         }
         assertEquals(Arrays.asList("23905", "23907", "23912", "23903", "23904"), values);
     }
-
 }
