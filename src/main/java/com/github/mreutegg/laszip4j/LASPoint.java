@@ -103,7 +103,7 @@ public final class LASPoint {
      * @return "Key-point" flag.
      */
     public boolean isKeyPoint() {
-        return p.getSynthetic_flag() == 1;
+        return p.getKeypoint_flag() == 1;
     }
 
     /**
