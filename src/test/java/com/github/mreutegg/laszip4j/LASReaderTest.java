@@ -64,12 +64,17 @@ public class LASReaderTest {
         assertEquals(8896, evlrs.get(0).getRecordLength());
         assertEquals("EPT Hierarchy", evlrs.get(0).getDescription());
         long numPoints = 0;
+        long numKeyPoints = 0;
         for (LASPoint p : reader.getPoints()) {
             classifications[p.getClassification()]++;
             numPoints++;
+            if (p.isKeyPoint()) {
+                numKeyPoints++;
+            }
         }
         assertEquals(LAZ_14_NUM_POINT_RECORDS, header.getLegacyNumberOfPointRecords());
         assertEquals(LAZ_14_NUM_POINT_RECORDS, numPoints);
+        assertEquals(30450, numKeyPoints);
         assertEquals(390708, classifications[0]);   // never classified
         assertEquals(6909405, classifications[2]);  // ground
         assertEquals(2613807, classifications[5]);  // high vegetation
