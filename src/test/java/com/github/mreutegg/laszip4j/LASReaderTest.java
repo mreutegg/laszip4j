@@ -282,6 +282,7 @@ public class LASReaderTest {
         double maxGpsTime = Double.MIN_VALUE;
         double minGpsTime = Double.MAX_VALUE;
         long numPoints = 0;
+        long numOverlap = 0;
         try (InputStream is = Files.newInputStream(files.las.toPath())) {
             for (LASPoint p : LASReader.getPoints(is)) {
                 classifications[p.getClassification()]++;
@@ -295,11 +296,15 @@ public class LASReaderTest {
                 maxIntensity = (char) Math.max(maxIntensity, p.getIntensity());
                 maxGpsTime = Math.max(maxGpsTime, p.getGPSTime());
                 minGpsTime = Math.min(minGpsTime, p.getGPSTime());
+                if (p.isOverlap()) {
+                    numOverlap++;
+                }
                 numPoints++;
             }
         }
         assertEquals(LAS_NUM_POINT_RECORDS, header.getNumberOfPointRecords());
         assertEquals(LAS_NUM_POINT_RECORDS, numPoints);
+        assertEquals(331153, numOverlap);
         assertEquals(110571, classifications[1]);       // unclassified
         assertEquals(867935, classifications[2]);       // ground
         assertEquals(44095, classifications[3]);        // low vegetation

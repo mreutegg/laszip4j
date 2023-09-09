@@ -114,6 +114,13 @@ public final class LASPoint {
     }
 
     /**
+     * @return "Overlap" flag.
+     */
+    public boolean isOverlap() {
+        return p.getOverlap_flag() == 1;
+    }
+
+    /**
      * @return "Scan Angle Rank (-90 to +90) - Left side" as a signed byte.
      */
     public byte getScanAngleRank() {
