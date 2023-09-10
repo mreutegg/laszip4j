@@ -5,7 +5,7 @@
 The LASzip library ported to Java
 
 This is a Java port of the [LASzip](https://github.com/LASzip/LASzip) and 
-[LAStools](https://github.com/LAStools/LAStools) libraries by Martin Isenburg.
+[LAStools](https://github.com/LAStools/LAStools) libraries by Martin Isenburg ([RIP](https://lidarmag.com/2021/10/30/in-memoriam-martin-isenburg-1972-2021/)).
 
 The port to Java is *not* complete. Many classes are stubs only and have not
 been ported. The main driver was to have a Java implementation of the laszip 
@@ -16,7 +16,7 @@ in Switzerland, which works fine.
 Usage is the same as with the native laszip utility, but invoked as a runnable
 jar:
 
-    java -jar laszip4j-0.13.jar -oparse xyzc -keep_class 3 4 5 6 10 -i 7015_2640.laz -o 7015_2640.xyzk
+    java -jar laszip4j-0.15.jar -oparse xyzc -keep_class 3 4 5 6 10 -i 7015_2640.laz -o 7015_2640.xyzk
     
 On top of LASzip and LAStools this library also provides convenience classes
 for reading LAS points. You can read LAS points in your code like this:
