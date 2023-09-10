@@ -386,7 +386,7 @@ public class LASwriterLAS extends LASwriter {
         {
             if (npoints != 0 || !update_npoints)
             {
-                fprintf(stderr,"WARNING: written %lld points but expected %d points\n", p_count, npoints);
+                fprintf(stderr,"WARNING: written %d points but expected %d points\n", p_count, npoints);
             }
         }
 
