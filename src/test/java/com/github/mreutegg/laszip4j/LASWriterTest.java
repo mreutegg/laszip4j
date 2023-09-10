@@ -16,20 +16,32 @@
  */
 package com.github.mreutegg.laszip4j;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class LASWriterTest {
 
     @Rule
     public final DataFiles files = new DataFiles();
 
-    private final String outputFileName = LASWriterTest.class.getSimpleName() + files.las.getName();
+    @Rule
+    public final TemporaryFolder temporaryFolder = new TemporaryFolder(new File("target"));
+
+    private File outputFile;
+
+    @Before
+    public void before() throws IOException {
+        outputFile = temporaryFolder.newFile("output.las");
+    }
 
     @Test
     public void write() {
@@ -44,12 +56,11 @@ public class LASWriterTest {
         });
 
         LASWriter writer = new LASWriter(reader);
-        File out = new File("target", outputFileName);
-        writer.write(out);
+        writer.write(outputFile);
 
         assertEquals(1696, numModified.get());
 
-        LASReader result = new LASReader(out);
+        LASReader result = new LASReader(outputFile);
         int numUnclassified = 0;
         int numLowPoint = 0;
         for (LASPoint p : result.getPoints()) {
@@ -61,5 +72,38 @@ public class LASWriterTest {
         }
         assertEquals(0, numLowPoint);
         assertEquals(112267, numUnclassified);
+    }
+
+    @Test
+    public void writeInsideRectangle() {
+        LASReader reader = new LASReader(files.laz)
+                .insideRectangle(2669450, 1257390, 2669480, 1257450);
+
+        LASWriter writer = new LASWriter(reader);
+        writer.write(outputFile);
+        LASReader result = new LASReader(outputFile);
+
+        int minX = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        long numPoints = 0;
+        for (LASPoint p : result.getPoints()) {
+            minX = Math.min(minX, p.getX());
+            assertTrue(minX >= 266945000);
+            maxX = Math.max(maxX, p.getX());
+            assertTrue(maxX <= 266948000);
+            minY = Math.min(minY, p.getY());
+            assertTrue(minY >= 125739000);
+            maxY = Math.max(maxY, p.getY());
+            assertTrue(maxY <= 125745000);
+            numPoints++;
+        }
+        assertEquals(38411, numPoints);
+        assertEquals(266945287, minX);
+        assertEquals(266947999, maxX);
+        assertEquals(125740433, minY);
+        assertEquals(125744999, maxY);
+
     }
 }

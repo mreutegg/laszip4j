@@ -21,6 +21,7 @@ import com.github.mreutegg.laszip4j.laslib.LASwriteOpener;
 import com.github.mreutegg.laszip4j.laslib.LASwriter;
 
 import java.io.File;
+import java.util.Arrays;
 
 /**
  * Utility for writing a LAS file.
@@ -48,10 +49,25 @@ public final class LASWriter {
             LASwriteOpener opener = new LASwriteOpener();
             opener.set_file_name(out.getAbsolutePath());
             LASwriter w = opener.open(r.header);
+            int[] byReturn = r.header.number_of_points_by_return;
+            Arrays.fill(byReturn, 0);
+            long[] extByReturn = r.header.extended_number_of_points_by_return;
+            Arrays.fill(extByReturn, 0);
+            r.header.number_of_point_records = 0;
             try {
                 while (r.read_point()) {
                     w.write_point(r.point);
+                    short returnNumber = r.point.get_return_number();
+                    returnNumber--;
+                    if (returnNumber < byReturn.length) {
+                        byReturn[returnNumber]++;
+                    }
+                    if (returnNumber < extByReturn.length) {
+                        extByReturn[returnNumber]++;
+                    }
+                    r.header.number_of_point_records++;
                 }
+                w.update_header(r.header);
             } finally {
                 w.close();
             }
