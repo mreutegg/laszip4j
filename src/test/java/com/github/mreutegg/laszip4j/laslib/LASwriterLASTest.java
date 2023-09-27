@@ -36,7 +36,7 @@ public class LASwriterLASTest {
     @Test
     public void writeLas() {
         Laszip.run(new String[]{"-i", files.laz.getPath(), "-o", las.getPath()});
-        LASReaderTest.verifyLaz(las);
+        LASReaderTest.verifyLaz(las, false);
     }
 
     @Test

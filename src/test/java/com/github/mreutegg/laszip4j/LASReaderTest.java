@@ -93,10 +93,15 @@ public class LASReaderTest {
 
     @Test
     public void read() {
-        verifyLaz(files.laz);
+        verifyLaz(files.laz, false);
     }
 
-    public static void verifyLaz(File file) {
+    @Test
+    public void readTryWithResources() {
+        verifyLaz(files.laz, true);
+    }
+
+    public static void verifyLaz(File file, boolean withCloseableIterable) {
         LASReader reader = new LASReader(file);
         LASHeader header = reader.getHeader();
 
@@ -105,9 +110,18 @@ public class LASReaderTest {
         long[] classifications = new long[Byte.MAX_VALUE];
         assertEquals("las_reframe.exe", header.getGeneratingSoftware());
         long numPoints = 0;
-        for (LASPoint p : reader.getPoints()) {
-            classifications[p.getClassification()]++;
-            numPoints++;
+        if (withCloseableIterable) {
+            try (CloseablePointIterable points = reader.points()) {
+                for (LASPoint p : points) {
+                    classifications[p.getClassification()]++;
+                    numPoints++;
+                }
+            }
+        } else {
+            for (LASPoint p : reader.getPoints()) {
+                classifications[p.getClassification()]++;
+                numPoints++;
+            }
         }
         assertEquals(LAZ_NUM_POINT_RECORDS, header.getLegacyNumberOfPointRecords());
         assertEquals(LAZ_NUM_POINT_RECORDS, numPoints);
@@ -330,6 +344,29 @@ public class LASReaderTest {
         assertEquals(65535, maxIntensity);
         assertEquals(207010949.553468, minGpsTime, 0.000001);
         assertEquals(207011954.826499, maxGpsTime, 0.000001);
+    }
+
+    @Test
+    public void readLASStreamTryWithResources() throws Exception {
+        long[] classifications = new long[Byte.MAX_VALUE];
+        long numPoints = 0;
+        try (InputStream is = Files.newInputStream(files.las.toPath())) {
+            for (LASPoint p : LASReader.getPoints(is)) {
+                classifications[p.getClassification()]++;
+                numPoints++;
+            }
+        }
+        assertEquals(LAS_NUM_POINT_RECORDS, numPoints);
+        assertEquals(110571, classifications[1]);       // unclassified
+        assertEquals(867935, classifications[2]);       // ground
+        assertEquals(44095, classifications[3]);        // low vegetation
+        assertEquals(26831, classifications[4]);        // medium vegetation
+        assertEquals(56595, classifications[5]);        // high vegetation
+        assertEquals(190318, classifications[6]);       // building
+        assertEquals(14373, classifications[7]);        // noise
+        assertEquals(296748, classifications[9]);       // water
+        assertEquals(44199, classifications[17]);       // bridge deck
+        assertEquals(1696, classifications[20]);        // reserved
     }
 
     @Test

@@ -24,8 +24,14 @@ import com.github.mreutegg.laszip4j.laszip.LASpoint;
 
 import static com.github.mreutegg.laszip4j.laszip.LASzip.LASZIP_DECOMPRESS_SELECTIVE_ALL;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import static java.util.Objects.requireNonNull;
@@ -113,6 +119,30 @@ public final class LASReader {
     }
 
     /**
+     * @return that LAS points as closeable iterable.
+     */
+    public CloseablePointIterable points() {
+        return new CloseablePointIterable() {
+
+            private final List<LASPointIterator> openIterators = new ArrayList<>();
+
+            @Override
+            public void close() {
+                for (LASPointIterator it : openIterators) {
+                    it.close();
+                }
+            }
+
+            @Override
+            public Iterator<LASPoint> iterator() {
+                LASPointIterator it = new LASPointIterator();
+                openIterators.add(it);
+                return it;
+            }
+        };
+    }
+
+    /**
      * Read LAS points from an input stream of a raw .las file.
      *
      * @param is the input stream.
@@ -122,6 +152,15 @@ public final class LASReader {
         return new LASReader(null, new BufferedInputStream(requireNonNull(is))).getPoints();
     }
 
+    /**
+     * Read LAS points from an input stream of a raw .las file.
+     *
+     * @param is the input stream.
+     * @return the LAS points as closeable iterable.
+     */
+    public static CloseablePointIterable points(InputStream is) {
+        return new LASReader(null, new BufferedInputStream(requireNonNull(is))).points();
+    }
     /**
      * @return the LAS header.
      */
@@ -168,7 +207,7 @@ public final class LASReader {
         return reader;
     }
 
-    private class LASPointIterator implements Iterator<LASPoint> {
+    private class LASPointIterator implements Iterator<LASPoint>, AutoCloseable {
 
         private final LASPoint end = new LASPoint(new LASpoint());
 
@@ -195,6 +234,11 @@ public final class LASReader {
             LASPoint p = next;
             next = null;
             return p;
+        }
+
+        @Override
+        public void close() {
+            r.close();
         }
 
         private LASPoint readNext() {
