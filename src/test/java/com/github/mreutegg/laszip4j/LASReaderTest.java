@@ -351,9 +351,11 @@ public class LASReaderTest {
         long[] classifications = new long[Byte.MAX_VALUE];
         long numPoints = 0;
         try (InputStream is = Files.newInputStream(files.las.toPath())) {
-            for (LASPoint p : LASReader.getPoints(is)) {
-                classifications[p.getClassification()]++;
-                numPoints++;
+            try (CloseablePointIterable points = LASReader.points(is)) {
+                for (LASPoint p : points) {
+                    classifications[p.getClassification()]++;
+                    numPoints++;
+                }
             }
         }
         assertEquals(LAS_NUM_POINT_RECORDS, numPoints);
