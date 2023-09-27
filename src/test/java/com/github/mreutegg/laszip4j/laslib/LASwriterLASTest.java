@@ -17,6 +17,7 @@
 package com.github.mreutegg.laszip4j.laslib;
 
 import com.github.mreutegg.laszip4j.DataFiles;
+import com.github.mreutegg.laszip4j.LASReader;
 import com.github.mreutegg.laszip4j.LASReaderTest;
 import com.github.mreutegg.laszip4j.lastools.Laszip;
 import org.junit.Rule;
@@ -36,7 +37,8 @@ public class LASwriterLASTest {
     @Test
     public void writeLas() {
         Laszip.run(new String[]{"-i", files.laz.getPath(), "-o", las.getPath()});
-        LASReaderTest.verifyLaz(las);
+        LASReader reader = new LASReader(las);
+        LASReaderTest.verifyLaz(reader.getPoints(), reader.getHeader());
     }
 
     @Test

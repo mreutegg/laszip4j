@@ -20,6 +20,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -92,20 +93,38 @@ public class LASReaderTest {
     }
 
     @Test
-    public void read() {
-        verifyLaz(files.laz);
+    public void readLAZ() {
+        LASReader reader = new LASReader(files.laz);
+        verifyLaz(reader.getPoints(), reader.getHeader());
     }
 
-    public static void verifyLaz(File file) {
-        LASReader reader = new LASReader(file);
-        LASHeader header = reader.getHeader();
+    @Test
+    public void readLAZStream() throws IOException {
+        LASHeader header;
+        try (InputStream is = Files.newInputStream(files.laz.toPath())) {
+            header = LASReader.getHeader(is);
+        }
+        try (InputStream is = Files.newInputStream(files.laz.toPath())) {
+            verifyLaz(LASReader.getPoints(is), header);
+        }
+    }
 
+    @Test
+    public void readLAZTryWithResources() {
+        LASReader reader = new LASReader(files.laz);
+        try (CloseablePointIterable points = reader.getCloseablePoints()) {
+            verifyLaz(points, reader.getHeader());
+        }
+    }
+
+    public static void verifyLaz(Iterable<LASPoint> points,
+                                 LASHeader header) {
         assertEquals(header.getNumberOfVariableLengthRecords(), StreamSupport.stream(header.getVariableLengthRecords().spliterator(), false).count());
 
         long[] classifications = new long[Byte.MAX_VALUE];
         assertEquals("las_reframe.exe", header.getGeneratingSoftware());
         long numPoints = 0;
-        for (LASPoint p : reader.getPoints()) {
+        for (LASPoint p : points) {
             classifications[p.getClassification()]++;
             numPoints++;
         }
