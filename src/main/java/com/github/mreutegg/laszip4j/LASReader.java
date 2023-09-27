@@ -121,7 +121,7 @@ public final class LASReader {
     /**
      * @return that LAS points as closeable iterable.
      */
-    public CloseablePointIterable points() {
+    public CloseablePointIterable getCloseablePoints() {
         return new CloseablePointIterable() {
 
             private final List<LASPointIterator> openIterators = new ArrayList<>();
@@ -143,7 +143,7 @@ public final class LASReader {
     }
 
     /**
-     * Read LAS points from an input stream of a raw .las file.
+     * Read LAS points from an input stream of a raw .las or .laz file.
      *
      * @param is the input stream.
      * @return the LAS points.
@@ -152,15 +152,6 @@ public final class LASReader {
         return new LASReader(null, new BufferedInputStream(requireNonNull(is))).getPoints();
     }
 
-    /**
-     * Read LAS points from an input stream of a raw .las file.
-     *
-     * @param is the input stream.
-     * @return the LAS points as closeable iterable.
-     */
-    public static CloseablePointIterable points(InputStream is) {
-        return new LASReader(null, new BufferedInputStream(requireNonNull(is))).points();
-    }
     /**
      * @return the LAS header.
      */

@@ -20,6 +20,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -92,36 +93,40 @@ public class LASReaderTest {
     }
 
     @Test
-    public void read() {
-        verifyLaz(files.laz, false);
+    public void readLAZ() {
+        LASReader reader = new LASReader(files.laz);
+        verifyLaz(reader.getPoints(), reader.getHeader());
     }
 
     @Test
-    public void readTryWithResources() {
-        verifyLaz(files.laz, true);
+    public void readLAZStream() throws IOException {
+        LASHeader header;
+        try (InputStream is = Files.newInputStream(files.laz.toPath())) {
+            header = LASReader.getHeader(is);
+        }
+        try (InputStream is = Files.newInputStream(files.laz.toPath())) {
+            verifyLaz(LASReader.getPoints(is), header);
+        }
     }
 
-    public static void verifyLaz(File file, boolean withCloseableIterable) {
-        LASReader reader = new LASReader(file);
-        LASHeader header = reader.getHeader();
+    @Test
+    public void readLAZTryWithResources() {
+        LASReader reader = new LASReader(files.laz);
+        try (CloseablePointIterable points = reader.getCloseablePoints()) {
+            verifyLaz(points, reader.getHeader());
+        }
+    }
 
+    public static void verifyLaz(Iterable<LASPoint> points,
+                                 LASHeader header) {
         assertEquals(header.getNumberOfVariableLengthRecords(), StreamSupport.stream(header.getVariableLengthRecords().spliterator(), false).count());
 
         long[] classifications = new long[Byte.MAX_VALUE];
         assertEquals("las_reframe.exe", header.getGeneratingSoftware());
         long numPoints = 0;
-        if (withCloseableIterable) {
-            try (CloseablePointIterable points = reader.points()) {
-                for (LASPoint p : points) {
-                    classifications[p.getClassification()]++;
-                    numPoints++;
-                }
-            }
-        } else {
-            for (LASPoint p : reader.getPoints()) {
-                classifications[p.getClassification()]++;
-                numPoints++;
-            }
+        for (LASPoint p : points) {
+            classifications[p.getClassification()]++;
+            numPoints++;
         }
         assertEquals(LAZ_NUM_POINT_RECORDS, header.getLegacyNumberOfPointRecords());
         assertEquals(LAZ_NUM_POINT_RECORDS, numPoints);
@@ -344,31 +349,6 @@ public class LASReaderTest {
         assertEquals(65535, maxIntensity);
         assertEquals(207010949.553468, minGpsTime, 0.000001);
         assertEquals(207011954.826499, maxGpsTime, 0.000001);
-    }
-
-    @Test
-    public void readLASStreamTryWithResources() throws Exception {
-        long[] classifications = new long[Byte.MAX_VALUE];
-        long numPoints = 0;
-        try (InputStream is = Files.newInputStream(files.las.toPath())) {
-            try (CloseablePointIterable points = LASReader.points(is)) {
-                for (LASPoint p : points) {
-                    classifications[p.getClassification()]++;
-                    numPoints++;
-                }
-            }
-        }
-        assertEquals(LAS_NUM_POINT_RECORDS, numPoints);
-        assertEquals(110571, classifications[1]);       // unclassified
-        assertEquals(867935, classifications[2]);       // ground
-        assertEquals(44095, classifications[3]);        // low vegetation
-        assertEquals(26831, classifications[4]);        // medium vegetation
-        assertEquals(56595, classifications[5]);        // high vegetation
-        assertEquals(190318, classifications[6]);       // building
-        assertEquals(14373, classifications[7]);        // noise
-        assertEquals(296748, classifications[9]);       // water
-        assertEquals(44199, classifications[17]);       // bridge deck
-        assertEquals(1696, classifications[20]);        // reserved
     }
 
     @Test
