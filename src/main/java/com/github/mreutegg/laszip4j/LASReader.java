@@ -119,7 +119,7 @@ public final class LASReader {
     }
 
     /**
-     * @return that LAS points as closeable iterable.
+     * @return the LAS points as closeable iterable.
      */
     public CloseablePointIterable getCloseablePoints() {
         return new CloseablePointIterable() {
