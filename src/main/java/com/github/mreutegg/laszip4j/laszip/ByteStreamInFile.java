@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UncheckedIOException;
 import java.nio.MappedByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.nio.channels.FileChannel.MapMode.READ_ONLY;
 
@@ -37,16 +39,15 @@ public class ByteStreamInFile extends ByteStreamInDataInput {
     }
 
     private static RandomAccessDataInput createRandomAccessDataInput(RandomAccessFile file) {
-        long length;
         try {
-            length = file.length();
+            long length = file.length();
+            if (length > Integer.MAX_VALUE) {
+                return new MultiMMappedDataInput(file, Integer.MAX_VALUE);
+            } else {
+                return new MMappedDataInput(file);
+            }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
-        }
-        if (length > Integer.MAX_VALUE) {
-            return new RandomAccessFileDataInput(file);
-        } else {
-            return new MMappedDataInput(file);
         }
     }
 
@@ -201,49 +202,87 @@ public class ByteStreamInFile extends ByteStreamInDataInput {
         }
     }
 
-    private static class RandomAccessFileDataInput extends RandomAccessDataInput {
+    static class MultiMMappedDataInput extends RandomAccessDataInput {
 
-        private final RandomAccessFile file;
+        private final List<MappedByteBuffer> buffers = new ArrayList<>();
 
-        RandomAccessFileDataInput(RandomAccessFile file) {
-            this.file = file;
+        private final byte[] one_byte = new byte[1];
+
+        private final long length;
+
+        private final int bufferSize;
+
+        private int currentBufferIndex = 0;
+
+        MultiMMappedDataInput(RandomAccessFile file, int bufferSize)
+                throws IOException {
+            this.bufferSize = bufferSize;
+            this.length = file.length();
+            long offset = 0;
+            long remainingLength = length;
+            while (remainingLength > 0) {
+                long size = Math.min(remainingLength, bufferSize);
+                buffers.add(file.getChannel().map(READ_ONLY, offset, size));
+                offset += size;
+                remainingLength -= size;
+            }
         }
 
         @Override
-        public void readFully(byte[] b, int off, int len) throws IOException {
-            file.readFully(b, off, len);
+        public void readFully(byte[] b, int off, int len) {
+            while (len > 0) {
+                MappedByteBuffer buffer = maybeTransitionToNextBuffer();
+                int remainingInBuffer = Math.min(buffer.remaining(), len);
+                buffer.get(b, off, remainingInBuffer);
+                len -= remainingInBuffer;
+                off += remainingInBuffer;
+            }
         }
 
         @Override
-        public int skipBytes(int n) throws IOException {
-            long pos = file.getFilePointer();
-            long remaining = file.length() - pos;
-            long skip = Math.min(remaining, n);
-            position(pos + skip);
-            return (int) skip;
+        public int skipBytes(int n) {
+            long remaining = length - position();
+            int skip = (int) Math.min(n, remaining);
+            position(position() + skip);
+            return skip;
         }
 
         @Override
-        public byte readByte() throws IOException {
-            return file.readByte();
+        public byte readByte() {
+            readFully(one_byte, 0, 1);
+            return one_byte[0];
         }
 
-        @Override
         public long position() {
-            try {
-                return file.getFilePointer();
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+            return getCurrentBuffer().position() + (long) currentBufferIndex * bufferSize;
         }
 
-        @Override
         public void position(long position) {
-            try {
-                file.seek(position);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
+            if (position > length) {
+                throw new IllegalArgumentException("position > " + length + ": " + position);
             }
+            currentBufferIndex = (int) (position / bufferSize);
+            getCurrentBuffer().position((int) (position % bufferSize));
+        }
+
+        private MappedByteBuffer maybeTransitionToNextBuffer()
+                throws UncheckedEOFException {
+            MappedByteBuffer current = getCurrentBuffer();
+            if (current.remaining() > 0) {
+                return current;
+            }
+            if (currentBufferIndex + 1 < buffers.size()) {
+                currentBufferIndex++;
+            } else {
+                throw new UncheckedEOFException();
+            }
+            current = getCurrentBuffer();
+            current.position(0);
+            return current;
+        }
+
+        private MappedByteBuffer getCurrentBuffer() {
+            return buffers.get(currentBufferIndex);
         }
     }
 }
