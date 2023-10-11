@@ -56,8 +56,9 @@ public class MultiMMappedDataInputTest {
         }
         input.position(file.length());
         assertEquals(file.length(), input.position());
+        long pos = file.length() + 1;
         try {
-            input.position(file.length() + 1);
+            input.position(pos);
             fail("IllegalArgumentException expected");
         } catch (IllegalArgumentException e) {
             // expected
