@@ -28,6 +28,8 @@ import static java.nio.channels.FileChannel.MapMode.READ_ONLY;
 
 public class ByteStreamInFile extends ByteStreamInDataInput {
 
+    private static final int MMAP_BUFFER_SIZE = Integer.getInteger("laszip4j.mmap.buffer.size", Integer.MAX_VALUE);
+
     private final RandomAccessFile file;
 
     private final RandomAccessDataInput in;
@@ -41,8 +43,8 @@ public class ByteStreamInFile extends ByteStreamInDataInput {
     private static RandomAccessDataInput createRandomAccessDataInput(RandomAccessFile file) {
         try {
             long length = file.length();
-            if (length > Integer.MAX_VALUE) {
-                return new MultiMMappedDataInput(file, Integer.MAX_VALUE);
+            if (length > MMAP_BUFFER_SIZE) {
+                return new MultiMMappedDataInput(file, MMAP_BUFFER_SIZE);
             } else {
                 return new MMappedDataInput(file);
             }
