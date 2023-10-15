@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -459,7 +460,7 @@ public class LASReaderTest {
         List<String> values = new ArrayList<>();
         for (LASPoint p : reader.getPoints()) {
             LASExtraBytes value = p.getExtraBytes(phi);
-            values.add(String.format("%.2f", value.getValue()));
+            values.add(String.format(Locale.US, "%.2f", value.getValue()));
         }
         assertEquals(Arrays.asList("0.80", "1.12", "1.00", "1.28", "1.52"), values);
     }
