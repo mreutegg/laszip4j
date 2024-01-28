@@ -104,6 +104,31 @@ public class LASWriterTest {
         assertEquals(266947999, maxX);
         assertEquals(125740433, minY);
         assertEquals(125744999, maxY);
+    }
 
+    @Test
+    public void setWithheld() {
+        final short lowPoint = 20;
+        final AtomicInteger numWithheld = new AtomicInteger();
+        LASReader reader = new LASReader(files.las).transform((point, modifier) -> {
+            if (point.getClassification() == lowPoint) {
+                modifier.setWithheld(true);
+                numWithheld.incrementAndGet();
+            }
+        });
+
+        LASWriter writer = new LASWriter(reader);
+        writer.write(outputFile);
+
+        assertEquals(1696, numWithheld.get());
+
+        numWithheld.set(0);
+        LASReader result = new LASReader(outputFile);
+        for (LASPoint p : result.getPoints()) {
+            if (p.isWithheld()) {
+                numWithheld.incrementAndGet();
+            }
+        }
+        assertEquals(1696, numWithheld.get());
     }
 }

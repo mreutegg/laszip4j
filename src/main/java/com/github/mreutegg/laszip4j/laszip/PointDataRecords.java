@@ -18,6 +18,8 @@ package com.github.mreutegg.laszip4j.laszip;
 
 import static com.github.mreutegg.laszip4j.laszip.MyDefs.I16_QUANTIZE;
 import static com.github.mreutegg.laszip4j.laszip.MyDefs.I8_CLAMP;
+import static com.github.mreutegg.laszip4j.laszip.MyDefs.clearBit;
+import static com.github.mreutegg.laszip4j.laszip.MyDefs.setBit;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -64,6 +66,7 @@ abstract class PointDataRecordXYZBase extends PointDataRecord {
     abstract float getScanAngle();
 
     abstract boolean hasClassificationFlag(ClassificationFlag flag);
+    abstract void setClassificationFlag(ClassificationFlag flag, boolean value);
     abstract boolean hasScanFlag(ScanFlag flag);
 }
 
@@ -154,6 +157,27 @@ class PointDataRecordPoint10 extends PointDataRecordXYZBase {
             default:
                 return false;
         }
+    }
+
+    /* In the Point10 format, the classification flags are in bits 5, 6, and 7 of the Classification byte. */
+    @Override
+    void setClassificationFlag(ClassificationFlag flag, boolean value) {
+        int bit;
+        switch(flag)
+        {
+            case Synthetic:
+                bit = 5;
+                break;
+            case KeyPoint:
+                bit = 6;
+                break;
+            case Withheld:
+                bit = 7;
+                break;
+            default:
+                return;
+        }
+        Classification = value ? setBit(Classification, bit) : clearBit(Classification, bit);
     }
 
     /* In the Point10 format, the scan flags are in bits 6 and 7 of the flags byte (byte 15). */
@@ -422,6 +446,30 @@ class PointDataRecordPoint14 extends PointDataRecordXYZBase implements IGpsTimeP
             default:
                 return false;
         }
+    }
+
+    /* In the Point14 format, the classification flags are in bits 0..3 of the Classification Flags bits (byte 16). */
+    @Override
+    void setClassificationFlag(ClassificationFlag flag, boolean value) {
+        int bit;
+        switch(flag)
+        {
+            case Synthetic:
+                bit = 0;
+                break;
+            case KeyPoint:
+                bit = 1;
+                break;
+            case Withheld:
+                bit = 2;
+                break;
+            case Overlap:
+                bit = 3;
+                break;
+            default:
+                return;
+        }
+        ScanFlags = value ? setBit(ScanFlags, bit) : clearBit(ScanFlags, bit);
     }
 
     /* In the Point10 format, the scan flags are in bits 6 and 7 of the 'scan flags' byte (byte 16). */
