@@ -125,7 +125,7 @@ public interface MyDefs {
     }
 
     static byte setBit(byte value, int bit) {
-        return (byte) (value | (1 << bit));
+        return (byte) (value | (byte) (1 << bit));
     }
 
     static byte clearBit(byte value, int bit) {
