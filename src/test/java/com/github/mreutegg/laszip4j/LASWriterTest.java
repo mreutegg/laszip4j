@@ -107,7 +107,7 @@ public class LASWriterTest {
     }
 
     @Test
-    public void setWithheld() {
+    public void setWithheld() throws IOException {
         final short lowPoint = 20;
         final AtomicInteger numWithheld = new AtomicInteger();
         LASReader reader = new LASReader(files.las).transform((point, modifier) -> {
@@ -130,5 +130,24 @@ public class LASWriterTest {
             }
         }
         assertEquals(1696, numWithheld.get());
+
+        reader = new LASReader(outputFile).transform((point, modifier) -> {
+            if (point.isWithheld()) {
+                modifier.setWithheld(false);
+            }
+        });
+
+        File noneWithheld = temporaryFolder.newFile("none-withheld.las");
+        writer = new LASWriter(reader);
+        writer.write(noneWithheld);
+
+        numWithheld.set(0);
+        result = new LASReader(noneWithheld);
+        for (LASPoint p : result.getPoints()) {
+            if (p.isWithheld()) {
+                numWithheld.incrementAndGet();
+            }
+        }
+        assertEquals(0, numWithheld.get());
     }
 }
