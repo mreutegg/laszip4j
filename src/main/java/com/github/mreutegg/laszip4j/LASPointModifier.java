@@ -27,4 +27,12 @@ public interface LASPointModifier {
      * @param classification the classification value.
      */
     void setClassification(short classification);
+
+    /**
+     * Sets the withheld flag of a point.
+     *
+     * @param withheld {@code true} if the withheld flag should be set,
+     *          {@code false} if it should be cleared.
+     */
+    void setWithheld(boolean withheld);
 }

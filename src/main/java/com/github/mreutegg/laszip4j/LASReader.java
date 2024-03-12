@@ -281,5 +281,10 @@ public final class LASReader {
         public void setClassification(short classification) {
             point.setClassification(classification);
         }
+
+        @Override
+        public void setWithheld(boolean withheld) {
+            point.setWithheld_flag(withheld);
+        }
     }
 }
