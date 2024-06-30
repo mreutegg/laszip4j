@@ -115,4 +115,20 @@ public interface MyDefs {
         System.arraycopy(data, 0, tmp, 0, data.length);
         return tmp;
     }
+
+    static short setBit(short value, int bit) {
+        return (short) (value | (short) (1 << bit));
+    }
+
+    static short clearBit(short value, int bit) {
+        return (short) (value & (~ (1 << bit)));
+    }
+
+    static byte setBit(byte value, int bit) {
+        return (byte) (value | (byte) (1 << bit));
+    }
+
+    static byte clearBit(byte value, int bit) {
+        return (byte) (value & (~ (1 << bit)));
+    }
 }

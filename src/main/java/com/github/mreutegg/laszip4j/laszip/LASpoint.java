@@ -277,6 +277,7 @@ public class LASpoint {
     public byte getSynthetic_flag() { return getPointXYZ().hasClassificationFlag(ClassificationFlag.Synthetic)?(byte)1:(byte)0; }
     public byte getKeypoint_flag() { return getPointXYZ().hasClassificationFlag(ClassificationFlag.KeyPoint)?(byte)1:(byte)0; }
     public byte getWithheld_flag() { return getPointXYZ().hasClassificationFlag(ClassificationFlag.Withheld)?(byte)1:(byte)0; }
+    public void setWithheld_flag(boolean withheld) { getPointXYZ().setClassificationFlag(ClassificationFlag.Withheld, withheld); }
     public byte getOverlap_flag() { return getPointXYZ().hasClassificationFlag(ClassificationFlag.Overlap)?(byte)1:(byte)0; }
     public byte getScan_angle_rank() { return getPointXYZ().getScanAngleRank(); }
     public float getScan_angle() { return getPointXYZ().getScanAngle(); }
