@@ -39,6 +39,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class LASReaderTest {
 
@@ -67,12 +68,24 @@ public class LASReaderTest {
         assertEquals("EPT Hierarchy", evlrs.get(0).getDescription());
         long numPoints = 0;
         long numKeyPoints = 0;
+        char minRed = Character.MAX_VALUE;
+        char maxRed = Character.MIN_VALUE;
+        char minGreen = Character.MAX_VALUE;
+        char maxGreen = Character.MIN_VALUE;
+        char minBlue = Character.MAX_VALUE;
+        char maxBlue = Character.MIN_VALUE;
         for (LASPoint p : reader.getPoints()) {
             classifications[p.getClassification()]++;
             numPoints++;
             if (p.isKeyPoint()) {
                 numKeyPoints++;
             }
+            minRed = (char) Math.min(minRed, p.getRed());
+            maxRed = (char) Math.max(maxRed, p.getRed());
+            minGreen = (char) Math.min(minGreen, p.getGreen());
+            maxGreen = (char) Math.max(maxGreen, p.getGreen());
+            minBlue = (char) Math.min(minBlue, p.getBlue());
+            maxBlue = (char) Math.max(maxBlue, p.getBlue());
         }
         assertEquals(LAZ_14_NUM_POINT_RECORDS, header.getLegacyNumberOfPointRecords());
         assertEquals(LAZ_14_NUM_POINT_RECORDS, numPoints);
@@ -91,6 +104,12 @@ public class LASReaderTest {
         assertEquals(5882, classifications[73]);    // extended classification 73
         assertEquals(221, classifications[76]);     // extended classification 76
         assertEquals(24, classifications[77]);      // extended classification 77
+        assertEquals(2048, minRed);
+        assertEquals(63744, maxRed);
+        assertEquals(8704, minGreen);
+        assertEquals(65024, maxGreen);
+        assertEquals(18688, minBlue);
+        assertEquals(63488, maxBlue);
     }
 
     @Test
@@ -497,5 +516,33 @@ public class LASReaderTest {
             values.add(String.format("%d", value.getRawValue().longValue()));
         }
         assertEquals(Arrays.asList("23905", "23907", "23912", "23903", "23904"), values);
+    }
+
+    @Test
+    public void readPointWithoutRGB() {
+        // extraBytes test file does not have RGB data
+        LASReader reader = new LASReader(files.extraBytes);
+
+        for (LASPoint p : reader.getPoints()) {
+            assertFalse(p.hasRGB());
+            try {
+                p.getRed();
+                fail("LASPoint.getRed() must throw IllegalStateException");
+            } catch (IllegalStateException e) {
+                // expected
+            }
+            try {
+                p.getGreen();
+                fail("LASPoint.getGreen() must throw IllegalStateException");
+            } catch (IllegalStateException e) {
+                // expected
+            }
+            try {
+                p.getBlue();
+                fail("LASPoint.getBlue() must throw IllegalStateException");
+            } catch (IllegalStateException e) {
+                // expected
+            }
+        }
     }
 }

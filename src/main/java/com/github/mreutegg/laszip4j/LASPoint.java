@@ -149,9 +149,17 @@ public final class LASPoint {
     }
 
     /**
+     * @return {@code true} if this point has RGB data; {@code false} otherwise.
+     */
+    public boolean hasRGB() {
+        return p.haveRgb();
+    }
+
+    /**
      * @return "Red" as an unsigned short (char).
      */
     public char getRed() {
+        checkHasRGB();
         return p.get_R();
     }
 
@@ -159,6 +167,7 @@ public final class LASPoint {
      * @return "Green" as an unsigned short (char).
      */
     public char getGreen() {
+        checkHasRGB();
         return p.get_G();
     }
 
@@ -166,6 +175,7 @@ public final class LASPoint {
      * @return "Blue" as an unsigned short (char).
      */
     public char getBlue() {
+        checkHasRGB();
         return p.get_B();
     }
 
@@ -220,5 +230,11 @@ public final class LASPoint {
 
     public LASExtraBytes getExtraBytes(LASExtraBytesDescription description) {
         return new LASExtraBytes(p, description);
+    }
+
+    private void checkHasRGB() throws IllegalStateException {
+        if (!hasRGB()) {
+            throw new IllegalStateException("Point does not have RGB data");
+        }
     }
 }
