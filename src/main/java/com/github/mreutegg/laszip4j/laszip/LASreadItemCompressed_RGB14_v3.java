@@ -133,10 +133,9 @@ public class LASreadItemCompressed_RGB14_v3 extends LASreadItemCompressed{
         if (contexts[current_context].unused)
         {
             createAndInitModelsAndDecompressors(current_context, last_item);
+            last_item = contexts[current_context].last_item;
         }
-        last_item = contexts[current_context].last_item;
     }
-
     // decompress
 
     if (changed_RGB)

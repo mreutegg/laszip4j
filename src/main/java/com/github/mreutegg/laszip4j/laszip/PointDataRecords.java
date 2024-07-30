@@ -27,7 +27,7 @@ import java.nio.ByteOrder;
 abstract class PointDataRecord {
 
     // For internal use only
-    public int CompressionContext = 0;
+    public static int CompressionContext = 0;
 }
 
 enum ClassificationFlag
