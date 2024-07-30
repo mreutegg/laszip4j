@@ -404,6 +404,7 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
         /* set scanner channel as current context */
 
         current_context = ((PointDataRecordPoint14)seedItem).getScannerChannel();
+        seedItem.CompressionContext = current_context;
 
         /* create and init models and decompressors */
 
@@ -449,6 +450,7 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
             }
             // switch context to current scanner channel
             current_context = scanner_channel;
+            last_item.CompressionContext = current_context;
 
             // get last for new context
             last_item = contexts[current_context].last_item;
@@ -665,7 +667,6 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
         }
 
         PointDataRecordPoint14 result = new PointDataRecordPoint14(last_item);
-        result.CompressionContext = current_context;
 
         // remember if the last point had a gps_time_change
         last_item.gps_time_change = gps_time_change;

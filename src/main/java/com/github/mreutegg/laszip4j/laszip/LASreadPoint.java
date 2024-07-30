@@ -361,7 +361,9 @@ public class LASreadPoint {
     public boolean read(PointDataRecord[] pointRecords)
     {
         int i; // unsigned
-
+        if(pointRecords.length > 0) {
+            pointRecords[0].CompressionContext = 0;
+        }
         try
         {
             if (dec != null)
@@ -407,14 +409,14 @@ public class LASreadPoint {
                 {
                     for (i = 0; i < num_readers; i++)
                     {
-                        pointRecords[i] = readers[i].read( i > 0 ? pointRecords[0].CompressionContext : 0);
+                        pointRecords[i] = readers[i].read( pointRecords[0].CompressionContext);
                     }
                 }
                 else
                 {
                     for (i = 0; i < num_readers; i++)
                     {
-                        pointRecords[i] = readers_raw[i].read(0);
+                        pointRecords[i] = readers_raw[i].read(pointRecords[0].CompressionContext);
                     }
                     if (layered_las14_compression)
                     {
@@ -429,14 +431,14 @@ public class LASreadPoint {
                         }
                         for (i = 0; i < num_readers; i++)
                         {
-                            ((LASreadItemCompressed)(readers_compressed[i])).init(pointRecords[i], i > 0 ? pointRecords[0].CompressionContext : 0);
+                            ((LASreadItemCompressed)(readers_compressed[i])).init(pointRecords[i], pointRecords[0].CompressionContext);
                         }
                     }
                     else
                     {
                         for (i = 0; i < num_readers; i++)
                         {
-                            ((LASreadItemCompressed)(readers_compressed[i])).init(pointRecords[i], i > 0 ? pointRecords[0].CompressionContext : 0);
+                            ((LASreadItemCompressed)(readers_compressed[i])).init(pointRecords[i], pointRecords[0].CompressionContext);
                         }
                         dec.init(instream);
                     }
@@ -448,7 +450,7 @@ public class LASreadPoint {
             {
                 for (i = 0; i < num_readers; i++)
                 {
-                    pointRecords[i] = readers[i].read( i > 0 ? pointRecords[0].CompressionContext : 0);
+                    pointRecords[i] = readers[i].read( pointRecords[0].CompressionContext);
                 }
             }
         }
