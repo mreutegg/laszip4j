@@ -42,7 +42,7 @@ public class LASreadItemCompressed_GPSTIME11_v2 extends LASreadItemCompressed {
     }
 
     @Override
-    public void init(PointDataRecord seedItem, int notUsed)
+    public void init(PointDataRecord seedItem, MutableInteger notUsed)
     {
         /* init state */
         last = 0; next = 0;
@@ -68,7 +68,7 @@ public class LASreadItemCompressed_GPSTIME11_v2 extends LASreadItemCompressed {
     }
 
     @Override
-    public PointDataRecord read(int notUsed)
+    public PointDataRecord read(MutableInteger notUsed)
     {
         PointDataRecordGpsTime result = new PointDataRecordGpsTime();
 

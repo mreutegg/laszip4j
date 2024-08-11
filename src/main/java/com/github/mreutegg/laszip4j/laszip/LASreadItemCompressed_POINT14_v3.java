@@ -154,7 +154,7 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
     }
 
     @Override
-    public void init(PointDataRecord seedItem, int notUsed) {
+    public void init(PointDataRecord seedItem, MutableInteger context) {
 
         ByteStreamIn instream = instreamProvider.getByteStreamIn();
 
@@ -404,6 +404,7 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
         /* set scanner channel as current context */
 
         current_context = ((PointDataRecordPoint14)seedItem).getScannerChannel();
+        context.set(current_context); // the POINT14 reader sets context for all other items
 
         /* create and init models and decompressors */
 
@@ -411,7 +412,7 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
     }
 
     @Override
-    public PointDataRecord read(int context) 
+    public PointDataRecord read(MutableInteger context)
     {
         // get last
 
@@ -449,6 +450,7 @@ public class LASreadItemCompressed_POINT14_v3 extends LASreadItemCompressed {
             }
             // switch context to current scanner channel
             current_context = scanner_channel;
+            context.set(current_context); // the POINT14 reader sets context for all other items
 
             // get last for new context
             last_item = contexts[current_context].last_item;

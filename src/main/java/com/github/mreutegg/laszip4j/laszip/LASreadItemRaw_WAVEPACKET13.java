@@ -18,7 +18,7 @@ public class LASreadItemRaw_WAVEPACKET13 extends LASreadItemRaw {
     private ByteBuffer bb = ByteBuffer.allocate(29).order(ByteOrder.LITTLE_ENDIAN);
 
     @Override
-    public PointDataRecordWavepacket read(int notUsed) {
+    public PointDataRecordWavepacket read(MutableInteger notUsed) {
         bb.clear();
         instream.getBytes(bb.array(), 29);
 

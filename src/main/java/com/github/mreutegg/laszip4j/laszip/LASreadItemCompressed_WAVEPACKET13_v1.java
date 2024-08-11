@@ -45,7 +45,7 @@ public class LASreadItemCompressed_WAVEPACKET13_v1 extends LASreadItemCompressed
         last_item = null;
     }
 
-    public void init(PointDataRecord seedItem, int notUsed)
+    public void init(PointDataRecord seedItem, MutableInteger notUsed)
     {
         /* init state */
         last_diff_32 = 0;
@@ -66,7 +66,7 @@ public class LASreadItemCompressed_WAVEPACKET13_v1 extends LASreadItemCompressed
         last_item = new PointDataRecordWavepacket((PointDataRecordWavepacket)seedItem);
     }
 
-    public PointDataRecord read(int notUsed)
+    public PointDataRecord read(MutableInteger notUsed)
     {
         PointDataRecordWavepacket result = new PointDataRecordWavepacket();
         result.DescriptorIndex = (short)dec.decodeSymbol(m_packet_index);

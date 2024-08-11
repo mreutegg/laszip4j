@@ -19,7 +19,7 @@ public class LASreadItemRaw_BYTE extends LASreadItemRaw {
     }
 
     @Override
-    public PointDataRecordBytes read(int notUsed) {
+    public PointDataRecordBytes read(MutableInteger notUsed) {
 
         PointDataRecordBytes result = new PointDataRecordBytes(byteCount);
         instream.getBytes(result.Bytes, byteCount);

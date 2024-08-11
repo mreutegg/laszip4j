@@ -361,6 +361,7 @@ public class LASreadPoint {
     public boolean read(PointDataRecord[] pointRecords)
     {
         int i; // unsigned
+        MutableInteger context = new MutableInteger(0);
 
         try
         {
@@ -407,14 +408,14 @@ public class LASreadPoint {
                 {
                     for (i = 0; i < num_readers; i++)
                     {
-                        pointRecords[i] = readers[i].read( i > 0 ? pointRecords[0].CompressionContext : 0);
+                        pointRecords[i] = readers[i].read(context);
                     }
                 }
                 else
                 {
                     for (i = 0; i < num_readers; i++)
                     {
-                        pointRecords[i] = readers_raw[i].read(0);
+                        pointRecords[i] = readers_raw[i].read(context);
                     }
                     if (layered_las14_compression)
                     {
@@ -429,14 +430,14 @@ public class LASreadPoint {
                         }
                         for (i = 0; i < num_readers; i++)
                         {
-                            ((LASreadItemCompressed)(readers_compressed[i])).init(pointRecords[i], i > 0 ? pointRecords[0].CompressionContext : 0);
+                            ((LASreadItemCompressed)(readers_compressed[i])).init(pointRecords[i], context);
                         }
                     }
                     else
                     {
                         for (i = 0; i < num_readers; i++)
                         {
-                            ((LASreadItemCompressed)(readers_compressed[i])).init(pointRecords[i], i > 0 ? pointRecords[0].CompressionContext : 0);
+                            ((LASreadItemCompressed)(readers_compressed[i])).init(pointRecords[i], context);
                         }
                         dec.init(instream);
                     }
@@ -448,7 +449,7 @@ public class LASreadPoint {
             {
                 for (i = 0; i < num_readers; i++)
                 {
-                    pointRecords[i] = readers[i].read( i > 0 ? pointRecords[0].CompressionContext : 0);
+                    pointRecords[i] = readers[i].read(context);
                 }
             }
         }

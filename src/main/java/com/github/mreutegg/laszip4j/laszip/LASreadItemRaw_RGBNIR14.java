@@ -18,7 +18,7 @@ public class LASreadItemRaw_RGBNIR14 extends LASreadItemRaw {
     private ByteBuffer bb = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN);
 
     @Override
-    public PointDataRecordRgbNIR read(int notUsed) {
+    public PointDataRecordRgbNIR read(MutableInteger notUsed) {
         bb.clear();
         instream.getBytes(bb.array(), 8);
 

@@ -51,7 +51,7 @@ public class LASreadItemCompressed_RGB14_v3 extends LASreadItemCompressed{
   }
 
   @Override
-  public void init(PointDataRecord seedItem, int context) {
+  public void init(PointDataRecord seedItem, MutableInteger context) {
 
     ByteStreamIn instream = instreamProvider.getByteStreamIn();
 
@@ -101,7 +101,7 @@ public class LASreadItemCompressed_RGB14_v3 extends LASreadItemCompressed{
         contexts[c].unused = true;
     }
 
-    current_context = context; // all other items use context set by POINT14 reader
+    current_context = context.get(); // all other items use context set by POINT14 reader
 
     createAndInitModelsAndDecompressors(current_context, (PointDataRecordRGB)seedItem);
   }
@@ -118,7 +118,7 @@ public class LASreadItemCompressed_RGB14_v3 extends LASreadItemCompressed{
   }
   
   @Override
-  public PointDataRecord read(int context) {
+  public PointDataRecord read(MutableInteger context) {
 
     PointDataRecordRGB result = new PointDataRecordRGB();
 
@@ -127,14 +127,14 @@ public class LASreadItemCompressed_RGB14_v3 extends LASreadItemCompressed{
 
     // check for context switch
 
-    if (current_context != context)
+    if (current_context != context.get())
     {
-        current_context = context; // all other items use context set by POINT14 reader
+        current_context = context.get(); // all other items use context set by POINT14 reader
         if (contexts[current_context].unused)
         {
             createAndInitModelsAndDecompressors(current_context, last_item);
+            last_item = contexts[current_context].last_item;
         }
-        last_item = contexts[current_context].last_item;
     }
 
     // decompress

@@ -18,7 +18,7 @@ public class LASreadItemRaw_POINT14 extends LASreadItemRaw {
     private ByteBuffer bb = ByteBuffer.allocate(30).order(ByteOrder.LITTLE_ENDIAN);
 
     @Override
-    public PointDataRecordPoint14 read(int notUsed) {
+    public PointDataRecordPoint14 read(MutableInteger notUsed) {
         bb.clear();
         instream.getBytes(bb.array(), 30);
 

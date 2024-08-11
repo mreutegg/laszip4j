@@ -12,6 +12,6 @@ package com.github.mreutegg.laszip4j.laszip;
 
 public abstract class LASreadItemCompressed extends LASreadItem {
 
-    public abstract void init(PointDataRecord seedItem, int context);
+    public abstract void init(PointDataRecord seedItem, MutableInteger context);
     public abstract boolean chunk_sizes();
 }

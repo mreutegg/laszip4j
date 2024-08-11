@@ -29,7 +29,7 @@ public class LASreadItemCompressed_BYTE_v1 extends LASreadItemCompressed {
     }
 
     @Override	
-    public void init(PointDataRecord seedItem, int notUsed)
+    public void init(PointDataRecord seedItem, MutableInteger notUsed)
     {
         /* init state */
 
@@ -41,7 +41,7 @@ public class LASreadItemCompressed_BYTE_v1 extends LASreadItemCompressed {
     }
 
     @Override	
-    public PointDataRecord read(int notUsed)
+    public PointDataRecord read(MutableInteger notUsed)
     {
         PointDataRecordBytes result = new PointDataRecordBytes(number);
 
