@@ -418,7 +418,7 @@ public class LASpoint {
     {
         for(PointDataRecord  r : PointRecords)
         {
-            if (null != r && r instanceof IGpsTimeProvider)
+            if (r instanceof IGpsTimeProvider)
                 return (IGpsTimeProvider)r;
         }
 

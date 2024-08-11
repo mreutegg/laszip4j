@@ -142,9 +142,19 @@ public final class LASPoint {
     }
 
     /**
+     * @return {@code true} if this point has "GPS Time"; {@code false} otherwise.
+     */
+    public boolean hasGPSTime() {
+        return p.haveGpsTime();
+    }
+
+    /**
      * @return "GPS Time" as a double.
+     * @throws IllegalStateException when called on a point without GPS Time.
+     * @see #hasGPSTime()
      */
     public double getGPSTime() {
+        checkHasGPSTime();
         return p.getGps_time();
     }
 
@@ -235,6 +245,12 @@ public final class LASPoint {
     private void checkHasRGB() throws IllegalStateException {
         if (!hasRGB()) {
             throw new IllegalStateException("Point does not have RGB data");
+        }
+    }
+
+    private void checkHasGPSTime() throws IllegalStateException {
+        if (!hasGPSTime()) {
+            throw new IllegalStateException("Point does not have GPS Time");
         }
     }
 }

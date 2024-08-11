@@ -545,4 +545,20 @@ public class LASReaderTest {
             }
         }
     }
+
+    @Test
+    public void readPointWithoutGPSTime() {
+        // extraBytes test file does not have GPS Time
+        LASReader reader = new LASReader(files.extraBytes);
+
+        for (LASPoint p : reader.getPoints()) {
+            assertFalse(p.hasGPSTime());
+            try {
+                p.getGPSTime();
+                fail("LASPoint.getGPSTime() must throw IllegalStateException");
+            } catch (IllegalStateException e) {
+                // expected
+            }
+        }
+    }
 }
