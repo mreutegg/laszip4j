@@ -20,7 +20,7 @@
     <groupId>com.github.mreutegg</groupId>
     <artifactId>laszip4j</artifactId>
     <packaging>jar</packaging>
-    <version>0.19-SNAPSHOT</version>
+    <version>0.20-SNAPSHOT</version>
     <name>laszip4j</name>
     <description>The LASzip library ported to Java</description>
     <url>https://github.com/mreutegg/laszip4j</url>
