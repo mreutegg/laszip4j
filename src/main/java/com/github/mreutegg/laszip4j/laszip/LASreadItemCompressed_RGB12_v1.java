@@ -32,7 +32,7 @@ public class LASreadItemCompressed_RGB12_v1 extends LASreadItemCompressed {
     }
 
     @Override	
-    public void init(PointDataRecord seedItem, int notUsed)
+    public void init(PointDataRecord seedItem, MutableInteger notUsed)
     {
         /* init state */
 
@@ -44,7 +44,7 @@ public class LASreadItemCompressed_RGB12_v1 extends LASreadItemCompressed {
     }
 
     @Override	
-    public PointDataRecord read(int notUsed)
+    public PointDataRecord read(MutableInteger notUsed)
     {       
         PointDataRecordRGB result = new PointDataRecordRGB();
 

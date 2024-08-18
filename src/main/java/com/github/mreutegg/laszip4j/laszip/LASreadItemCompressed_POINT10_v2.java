@@ -62,7 +62,7 @@ public class LASreadItemCompressed_POINT10_v2 extends LASreadItemCompressed {
     }
 
     @Override	
-    public void init(PointDataRecord seedItem, int notUsed)
+    public void init(PointDataRecord seedItem, MutableInteger notUsed)
     {
         int i; // unsigned
 
@@ -99,7 +99,7 @@ public class LASreadItemCompressed_POINT10_v2 extends LASreadItemCompressed {
     }
 
     @Override	
-    public PointDataRecord read(int notUsed)
+    public PointDataRecord read(MutableInteger notUsed)
     {
         int r, n, m, l; // unsigned
         int k_bits; // unsigned

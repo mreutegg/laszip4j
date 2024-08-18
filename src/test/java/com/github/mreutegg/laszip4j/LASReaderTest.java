@@ -561,4 +561,34 @@ public class LASReaderTest {
             }
         }
     }
+
+    @Test
+    public void readLaz14v3RGB() {
+        LASReader reader = new LASReader(files.laz14v3rgb);
+
+        long numPoints = 0;
+        char minRed = Character.MAX_VALUE;
+        char maxRed = Character.MIN_VALUE;
+        char minGreen = Character.MAX_VALUE;
+        char maxGreen = Character.MIN_VALUE;
+        char minBlue = Character.MAX_VALUE;
+        char maxBlue = Character.MIN_VALUE;
+        for (LASPoint p : reader.getPoints()) {
+            numPoints++;
+            minRed = (char) Math.min(minRed, p.getRed());
+            maxRed = (char) Math.max(maxRed, p.getRed());
+            minGreen = (char) Math.min(minGreen, p.getGreen());
+            maxGreen = (char) Math.max(maxGreen, p.getGreen());
+            minBlue = (char) Math.min(minBlue, p.getBlue());
+            maxBlue = (char) Math.max(maxBlue, p.getBlue());
+        }
+
+        assertEquals(56644, numPoints);
+        assertEquals(10499, minRed);
+        assertEquals(62736, maxRed);
+        assertEquals(15324, minGreen);
+        assertEquals(63068, maxGreen);
+        assertEquals(21877, minBlue);
+        assertEquals(63435, maxBlue);
+    }
 }

@@ -53,7 +53,7 @@ public class LASreadItemCompressed_POINT10_v1 extends LASreadItemCompressed {
     }
 
     @Override
-    public void init(PointDataRecord seedItem, int notUsed) {
+    public void init(PointDataRecord seedItem, MutableInteger notUsed) {
 
         int i;
 
@@ -81,7 +81,7 @@ public class LASreadItemCompressed_POINT10_v1 extends LASreadItemCompressed {
     }
 
     @Override
-    public PointDataRecord read(int notUsed) {
+    public PointDataRecord read(MutableInteger notUsed) {
 
         // find median difference for x and y from 3 preceding differences
         int median_x;

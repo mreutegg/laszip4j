@@ -12,5 +12,5 @@ package com.github.mreutegg.laszip4j.laszip;
 
 public abstract class LASreadItem {
 
-    public abstract PointDataRecord read(int context);
+    public abstract PointDataRecord read(MutableInteger context);
 }

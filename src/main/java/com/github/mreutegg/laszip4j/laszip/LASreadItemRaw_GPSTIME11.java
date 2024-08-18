@@ -18,7 +18,7 @@ public class LASreadItemRaw_GPSTIME11 extends LASreadItemRaw {
     private ByteBuffer bb = ByteBuffer.allocate(Long.BYTES).order(ByteOrder.LITTLE_ENDIAN);
 
     @Override
-    public PointDataRecordGpsTime read(int notUsed) {
+    public PointDataRecordGpsTime read(MutableInteger notUsed) {
 
         bb.clear();
         instream.getBytes(bb.array(), Long.BYTES);

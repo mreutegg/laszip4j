@@ -37,7 +37,7 @@ public class LASreadItemCompressed_GPSTIME11_v1 extends LASreadItemCompressed {
     }
 
     @Override
-    public void init(PointDataRecord seedItem, int notUsed)
+    public void init(PointDataRecord seedItem, MutableInteger notUsed)
     {
         /* init state */
         last_gpstime_diff = 0;
@@ -52,7 +52,7 @@ public class LASreadItemCompressed_GPSTIME11_v1 extends LASreadItemCompressed {
     }
 
     @Override
-    public PointDataRecordGpsTime read(int notUsed)
+    public PointDataRecordGpsTime read(MutableInteger notUsed)
     {
         int multi;
         if (last_gpstime_diff == 0) // if the last integer difference was zero
