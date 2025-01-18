@@ -38,7 +38,7 @@ public class DataFiles extends ExternalResource {
     public static final int LAS_NUM_POINT_RECORDS = 1653361;
 
     public static final String LAZ_14_NAME = "autzen-classified.copc.laz";
-    private static final String LAZ_14_BASE_URL = "https://github.com/PDAL/data/raw/master/autzen";
+    private static final String LAZ_14_BASE_URL = "https://github.com/PDAL/data/raw/ce0024257c573526389c4db9ab26e82739b8aaa9/autzen";
     public static final int LAZ_14_NUM_POINT_RECORDS = 10653336;
 
     // test file contributed via https://github.com/mreutegg/laszip4j/pull/141
