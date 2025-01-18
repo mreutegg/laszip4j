@@ -118,19 +118,9 @@ public class LASreadItemCompressed_BYTE14_v3 extends LASreadItemCompressed{
           }
         }
       
-        /* how many bytes do we need to read */
-      
-        int num_bytes = 0;
-      
-        for (i = 0; i < number; i++)
-        {
-          if (requested_Bytes[i]) num_bytes += num_bytes_Bytes[i];
-        }
-
         /* load the requested bytes and init the corresponding instreams and decoders */
 
         byte[] bytes;
-        num_bytes = 0;
         for (i = 0; i < number; i++)
         {
           if (requested_Bytes[i])
@@ -141,7 +131,6 @@ public class LASreadItemCompressed_BYTE14_v3 extends LASreadItemCompressed{
               instream.getBytes(bytes, num_bytes_Bytes[i]);
               instream_Bytes[i].init(bytes, num_bytes_Bytes[i]);
               dec_Bytes[i].init(instream_Bytes[i]);
-              num_bytes += num_bytes_Bytes[i];
               changed_Bytes[i] = true;
             }
             else
