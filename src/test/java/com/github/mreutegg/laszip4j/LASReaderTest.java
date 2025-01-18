@@ -593,7 +593,7 @@ public class LASReaderTest {
     }
 
     @Test
-    public void read() {
+    public void readLaz14v3ExtraBytes() {
         LASReader reader = new LASReader(files.laz14v3bytesCompressed);
 
         int minX = Integer.MAX_VALUE;
