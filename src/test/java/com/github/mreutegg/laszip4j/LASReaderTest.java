@@ -591,4 +591,28 @@ public class LASReaderTest {
         assertEquals(21877, minBlue);
         assertEquals(63435, maxBlue);
     }
+
+    @Test
+    public void read() {
+        LASReader reader = new LASReader(files.laz14v3bytesCompressed);
+
+        int minX = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        long numPoints = 0;
+        for (LASPoint p : reader.getPoints()) {
+            minX = Math.min(minX, p.getX());
+            maxX = Math.max(maxX, p.getX());
+            minY = Math.min(minY, p.getY());
+            maxY = Math.max(maxY, p.getY());
+            numPoints++;
+        }
+
+        assertEquals(DataFiles.LAZ_14_BYTES_V3_COMPRESSED_NUM_POINT_RECORDS, numPoints);
+        assertEquals(7025714, minX);
+        assertEquals(7031235, maxX);
+        assertEquals(7520541, minY);
+        assertEquals(7525854, maxY);
+    }
 }

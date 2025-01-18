@@ -29,9 +29,6 @@ public class LASreadItemCompressed_BYTE14_v3 extends LASreadItemCompressed{
   
     private boolean[] requested_Bytes;
   
-    private byte[] bytes;
-    private int num_bytes_allocated;
-  
     private int current_context;
     private LAScontextBYTE14[] contexts = new LAScontextBYTE14[4];
   
@@ -76,11 +73,6 @@ public class LASreadItemCompressed_BYTE14_v3 extends LASreadItemCompressed{
                 requested_Bytes[i] = (decompress_selective & (LASZIP_DECOMPRESS_SELECTIVE_BYTE0 << i)) != 0;
             }
         }
-
-        /* init the bytes buffer to zero */
-
-        bytes = null;
-        num_bytes_allocated = 0;
 
         /* mark the four scanner channel contexts as uninitialized */
 
@@ -134,17 +126,10 @@ public class LASreadItemCompressed_BYTE14_v3 extends LASreadItemCompressed{
         {
           if (requested_Bytes[i]) num_bytes += num_bytes_Bytes[i];
         }
-      
-        /* make sure the buffer is sufficiently large */
-      
-        if (num_bytes > num_bytes_allocated)
-        {
-          bytes = new byte[num_bytes];
-          num_bytes_allocated = num_bytes;
-        }
-      
-        /* load the requested bytes and init the corresponding instreams an decoders */
-      
+
+        /* load the requested bytes and init the corresponding instreams and decoders */
+
+        byte[] bytes;
         num_bytes = 0;
         for (i = 0; i < number; i++)
         {
@@ -152,6 +137,7 @@ public class LASreadItemCompressed_BYTE14_v3 extends LASreadItemCompressed{
           {
             if (num_bytes_Bytes[i] != 0)
             {
+              bytes = new byte[num_bytes_Bytes[i]];
               instream.getBytes(bytes, num_bytes_Bytes[i]);
               instream_Bytes[i].init(bytes, num_bytes_Bytes[i]);
               dec_Bytes[i].init(instream_Bytes[i]);
