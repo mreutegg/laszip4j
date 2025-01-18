@@ -44,6 +44,9 @@ public class DataFiles extends ExternalResource {
     // test file contributed via https://github.com/mreutegg/laszip4j/pull/141
     public static final String LAZ_14_V3_RGB_NAME = "500m_5460_59370_IM2023_subset.laz";
 
+    public static final String LAZ_14_BYTES_V3_COMPRESSED_NAME = "2019_saipan_waveform.laz";
+    public static final int LAZ_14_BYTES_V3_COMPRESSED_NUM_POINT_RECORDS = 5198;
+
     // file created with txt2las as described here: https://groups.google.com/g/lasroom/c/DWQ2GXKE8f8
     public static final String EXTRA_TYPES_NAME = "extra-bytes.las";
 
@@ -55,6 +58,7 @@ public class DataFiles extends ExternalResource {
     public final File laz14 = new File(target, LAZ_14_NAME);
     public final File extraBytes = new File(resources, EXTRA_TYPES_NAME);
     public final File laz14v3rgb = new File(resources, LAZ_14_V3_RGB_NAME);
+    public final File laz14v3bytesCompressed = new File(resources, LAZ_14_BYTES_V3_COMPRESSED_NAME);
 
     @Override
     protected void before() throws Throwable {
@@ -63,32 +67,22 @@ public class DataFiles extends ExternalResource {
 
     public void download() throws Exception {
         if (!laz.exists()) {
-            URI url = new URI(LAZ_BASE_URL + "/" + LAZ_NAME);
-            try (CloseableHttpClient client = HttpClients.createDefault()) {
-                try (CloseableHttpResponse response = client.execute(new HttpGet(url))) {
-                    try (OutputStream out = Files.newOutputStream(laz.toPath())) {
-                        response.getEntity().writeTo(out);
-                    }
-                }
-            }
+            download(LAZ_BASE_URL + "/" + LAZ_NAME, laz);
         }
         if (!las.exists()) {
-            URI url = new URI(LAS_BASE_URL + "/" + LAS_NAME);
-            try (CloseableHttpClient client = HttpClients.createDefault()) {
-                try (CloseableHttpResponse response = client.execute(new HttpGet(url))) {
-                    try (OutputStream out = Files.newOutputStream(las.toPath())) {
-                        response.getEntity().writeTo(out);
-                    }
-                }
-            }
+            download(LAS_BASE_URL + "/" + LAS_NAME, las);
         }
         if (!laz14.exists()) {
-            URI url = new URI(LAZ_14_BASE_URL + "/" + LAZ_14_NAME);
-            try (CloseableHttpClient client = HttpClients.createDefault()) {
-                try (CloseableHttpResponse response = client.execute(new HttpGet(url))) {
-                    try (OutputStream out = Files.newOutputStream(laz14.toPath())) {
-                        response.getEntity().writeTo(out);
-                    }
+            download(LAZ_14_BASE_URL + "/" + LAZ_14_NAME, laz14);
+        }
+    }
+
+    private static void download(String uri, File file) throws Exception {
+        URI url = new URI(uri);
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            try (CloseableHttpResponse response = client.execute(new HttpGet(url))) {
+                try (OutputStream out = Files.newOutputStream(file.toPath())) {
+                    response.getEntity().writeTo(out);
                 }
             }
         }
