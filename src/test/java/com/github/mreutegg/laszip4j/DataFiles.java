@@ -16,10 +16,9 @@
  */
 package com.github.mreutegg.laszip4j;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.junit.rules.ExternalResource;
 
 import java.io.File;
@@ -80,11 +79,12 @@ public class DataFiles extends ExternalResource {
     private static void download(String uri, File file) throws Exception {
         URI url = new URI(uri);
         try (CloseableHttpClient client = HttpClients.createDefault()) {
-            try (CloseableHttpResponse response = client.execute(new HttpGet(url))) {
+            client.execute(new HttpGet(url), response -> {
                 try (OutputStream out = Files.newOutputStream(file.toPath())) {
                     response.getEntity().writeTo(out);
                 }
-            }
+                return true;
+            });
         }
     }
 }
