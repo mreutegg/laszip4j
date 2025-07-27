@@ -615,4 +615,31 @@ public class LASReaderTest {
         assertEquals(7520541, minY);
         assertEquals(7525854, maxY);
     }
+
+    @Test
+    public void readRecordFormat7() {
+        LASReader reader = new LASReader(files.recordFormat7);
+
+        long numPoints = 0;
+        for (LASPoint p : reader.getPoints()) {
+            assertTrue(p.hasRGB());
+            assertFalse(p.hasNIR());
+            numPoints++;
+        }
+
+        assertEquals(DataFiles.LAZ_RECORD_FORMAT_7_NUM_POINT_RECORDS, numPoints);
+    }
+
+    @Test
+    public void readRecordFormat8() {
+        LASReader reader = new LASReader(files.recordFormat8);
+
+        long numPoints = 0;
+        for (LASPoint p : reader.getPoints()) {
+            assertTrue(p.hasNIR());
+            numPoints++;
+        }
+
+        assertEquals(DataFiles.LAZ_RECORD_FORMAT_8_NUM_POINT_RECORDS, numPoints);
+    }
 }

@@ -110,7 +110,7 @@ public class LASreadItemCompressed_RGBNIR14_v3 extends LASreadItemCompressed{
             else
             {
                 instream_RGB.init(null, 0);
-                changed_RGB = true;
+                changed_RGB = false;
             }
         }
         else

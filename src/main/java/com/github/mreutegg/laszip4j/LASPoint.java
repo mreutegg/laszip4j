@@ -190,9 +190,17 @@ public final class LASPoint {
     }
 
     /**
+     * @return {@code true} if this point has NIR data; {@code false} otherwise.
+     */
+    public boolean hasNIR() {
+        return p.haveNIR();
+    }
+
+    /**
      * @return "NIR" as an unsigned short (char).
      */
     public char getNIR() {
+        checkHasNIR();
         return p.get_I();
     }
 
@@ -251,6 +259,12 @@ public final class LASPoint {
     private void checkHasGPSTime() throws IllegalStateException {
         if (!hasGPSTime()) {
             throw new IllegalStateException("Point does not have GPS Time");
+        }
+    }
+
+    private void checkHasNIR() throws IllegalStateException {
+        if (!hasNIR()) {
+            throw new IllegalStateException("Point does not have NIR data");
         }
     }
 }
