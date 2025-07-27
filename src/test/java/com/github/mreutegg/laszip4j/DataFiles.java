@@ -46,6 +46,14 @@ public class DataFiles extends ExternalResource {
     public static final String LAZ_14_BYTES_V3_COMPRESSED_NAME = "2019_saipan_waveform.laz";
     public static final int LAZ_14_BYTES_V3_COMPRESSED_NUM_POINT_RECORDS = 5198;
 
+    // test file with record format 8
+    public static final String LAZ_RECORD_FORMAT_8 = "record-format-8.laz";
+    public static final int LAZ_RECORD_FORMAT_8_NUM_POINT_RECORDS = 62;
+
+    // test file with record format 7
+    public static final String LAZ_RECORD_FORMAT_7 = "record-format-7.laz";
+    public static final int LAZ_RECORD_FORMAT_7_NUM_POINT_RECORDS = 62;
+
     // file created with txt2las as described here: https://groups.google.com/g/lasroom/c/DWQ2GXKE8f8
     public static final String EXTRA_TYPES_NAME = "extra-bytes.las";
 
@@ -58,6 +66,8 @@ public class DataFiles extends ExternalResource {
     public final File extraBytes = new File(resources, EXTRA_TYPES_NAME);
     public final File laz14v3rgb = new File(resources, LAZ_14_V3_RGB_NAME);
     public final File laz14v3bytesCompressed = new File(resources, LAZ_14_BYTES_V3_COMPRESSED_NAME);
+    public final File recordFormat8 = new File(resources, LAZ_RECORD_FORMAT_8);
+    public final File recordFormat7 = new File(resources, LAZ_RECORD_FORMAT_7);
 
     @Override
     protected void before() throws Throwable {

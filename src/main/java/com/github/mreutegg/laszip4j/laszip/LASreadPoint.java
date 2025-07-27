@@ -470,6 +470,7 @@ public class LASreadPoint {
             }
             else
             {
+                exception.printStackTrace(System.err);
                 // decompression error
                 last_error = String.format("chunk with index %d of %d is corrupt", current_chunk, tabled_chunks);
                 // if we know where the next chunk starts ...
