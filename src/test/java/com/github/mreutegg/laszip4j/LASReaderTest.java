@@ -624,6 +624,12 @@ public class LASReaderTest {
         for (LASPoint p : reader.getPoints()) {
             assertTrue(p.hasRGB());
             assertFalse(p.hasNIR());
+            try {
+                p.getNIR();
+                fail("must throw IllegalStateException");
+            } catch (IllegalStateException e) {
+                // expected
+            }
             numPoints++;
         }
 
@@ -637,6 +643,7 @@ public class LASReaderTest {
         long numPoints = 0;
         for (LASPoint p : reader.getPoints()) {
             assertTrue(p.hasNIR());
+            p.getNIR();
             numPoints++;
         }
 
