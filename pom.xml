@@ -20,7 +20,7 @@
     <groupId>com.github.mreutegg</groupId>
     <artifactId>laszip4j</artifactId>
     <packaging>jar</packaging>
-    <version>0.21</version>
+    <version>0.22-SNAPSHOT</version>
     <name>laszip4j</name>
     <description>The LASzip library ported to Java</description>
     <url>https://github.com/mreutegg/laszip4j</url>
@@ -45,7 +45,7 @@
         <connection>scm:git:https://github.com/mreutegg/laszip4j.git</connection>
         <developerConnection>scm:git:git@github.com:mreutegg/laszip4j.git</developerConnection>
         <url>https://github.com/mreutegg/laszip4j/tree/master</url>
-        <tag>laszip4j-0.21</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
